@@ -58,11 +58,40 @@ def make_future_prediction(model, last_sequence, scaler, steps=24):
     return future_predictions
 
 
-def plot_predictions(data, predictions, future_predictions=None):
+def plot_predictions(data, predictions, future_predictions=None, radon_col=None, temp_col=None, pressure_col=None):
     """Визуализация прогнозов с использованием Plotly."""
+    # Определение колонок, если они не указаны
+    if radon_col is None or temp_col is None or pressure_col is None:
+        columns = data.columns
+        
+        # Определение названий колонок для радона, температуры и давления
+        if radon_col is None:
+            for col in columns:
+                if 'radon' in col.lower():
+                    radon_col = col
+                    break
+            if radon_col is None:
+                radon_col = columns[0]  # По умолчанию первая колонка
+        
+        if temp_col is None:
+            for col in columns:
+                if 'temp' in col.lower():
+                    temp_col = col
+                    break
+            if temp_col is None and len(columns) > 1:
+                temp_col = columns[1]  # По умолчанию вторая колонка
+        
+        if pressure_col is None:
+            for col in columns:
+                if 'pressure' in col.lower() or 'давлен' in col.lower():
+                    pressure_col = col
+                    break
+            if pressure_col is None and len(columns) > 2:
+                pressure_col = columns[2]  # По умолчанию третья колонка
+    
     # Подготовка данных для визуализации
     dates = data.index[-len(predictions):]
-    actual = data['Radon (Bq.m3)'].iloc[-len(predictions):].values
+    actual = data[radon_col].iloc[-len(predictions):].values
     
     # Создание фигуры с двумя y-осями
     fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -79,19 +108,22 @@ def plot_predictions(data, predictions, future_predictions=None):
         secondary_y=False,
     )
     
-    # Добавление температуры
-    fig.add_trace(
-        go.Scatter(x=dates, y=data['Temperature (°C)'].iloc[-len(predictions):].values, name="Температура (°C)", 
-                  line=dict(color='orange', dash='dot')),
-        secondary_y=True,
-    )
+    # Добавление температуры, если колонка существует
+    if temp_col in data.columns:
+        fig.add_trace(
+            go.Scatter(x=dates, y=data[temp_col].iloc[-len(predictions):].values, 
+                      name=f"{temp_col}", line=dict(color='orange', dash='dot')),
+            secondary_y=True,
+        )
     
-    # Добавление давления
-    fig.add_trace(
-        go.Scatter(x=dates, y=data['Pressure (mBar)'].iloc[-len(predictions):].values / 10, name="Давление / 10 (mBar)", 
-                  line=dict(color='green', dash='dot')),
-        secondary_y=True,
-    )
+    # Добавление давления, если колонка существует
+    if pressure_col in data.columns:
+        # Делим на 10 для лучшего масштабирования на графике
+        fig.add_trace(
+            go.Scatter(x=dates, y=data[pressure_col].iloc[-len(predictions):].values / 10, 
+                      name=f"{pressure_col} / 10", line=dict(color='green', dash='dot')),
+            secondary_y=True,
+        )
     
     # Если есть прогнозы на будущее, добавляем их
     if future_predictions is not None and len(future_predictions) > 0:
@@ -131,7 +163,7 @@ def plot_predictions(data, predictions, future_predictions=None):
     )
     
     # Настройка осей Y
-    fig.update_yaxes(title_text="Уровень радона (Бк/м³)", secondary_y=False)
+    fig.update_yaxes(title_text="Уровень радона", secondary_y=False)
     fig.update_yaxes(title_text="Значение", secondary_y=True)
     
     # Добавление ползунка и кнопок для выбора диапазона
@@ -153,11 +185,40 @@ def plot_predictions(data, predictions, future_predictions=None):
     return fig
 
 
-def plot_predictions_static(data, predictions, future_predictions=None):
+def plot_predictions_static(data, predictions, future_predictions=None, radon_col=None, temp_col=None, pressure_col=None):
     """Статическая визуализация прогнозов с использованием Matplotlib."""
+    # Определение колонок, если они не указаны
+    if radon_col is None or temp_col is None or pressure_col is None:
+        columns = data.columns
+        
+        # Определение названий колонок для радона, температуры и давления
+        if radon_col is None:
+            for col in columns:
+                if 'radon' in col.lower():
+                    radon_col = col
+                    break
+            if radon_col is None:
+                radon_col = columns[0]  # По умолчанию первая колонка
+        
+        if temp_col is None:
+            for col in columns:
+                if 'temp' in col.lower():
+                    temp_col = col
+                    break
+            if temp_col is None and len(columns) > 1:
+                temp_col = columns[1]  # По умолчанию вторая колонка
+        
+        if pressure_col is None:
+            for col in columns:
+                if 'pressure' in col.lower() or 'давлен' in col.lower():
+                    pressure_col = col
+                    break
+            if pressure_col is None and len(columns) > 2:
+                pressure_col = columns[2]  # По умолчанию третья колонка
+    
     # Подготовка данных для визуализации
     dates = data.index[-len(predictions):]
-    actual = data['Radon (Bq.m3)'].iloc[-len(predictions):].values
+    actual = data[radon_col].iloc[-len(predictions):].values
     
     plt.figure(figsize=(14, 8))
     
@@ -190,16 +251,23 @@ def plot_predictions_static(data, predictions, future_predictions=None):
     
     plt.title('Прогнозирование уровня радона')
     plt.xlabel('Дата')
-    plt.ylabel('Уровень радона (Бк/м³)')
+    plt.ylabel('Уровень радона')
     plt.legend(loc='upper left')
     plt.grid(True)
     
     # Создание второй оси Y для температуры и давления
     ax2 = plt.gca().twinx()
-    ax2.plot(dates, data['Temperature (°C)'].iloc[-len(predictions):].values, 
-             label='Температура (°C)', color='orange', linestyle=':')
-    ax2.plot(dates, data['Pressure (mBar)'].iloc[-len(predictions):].values / 10, 
-             label='Давление / 10 (mBar)', color='green', linestyle=':')
+    
+    # Добавление температуры, если колонка существует
+    if temp_col in data.columns:
+        ax2.plot(dates, data[temp_col].iloc[-len(predictions):].values, 
+                label=f"{temp_col}", color='orange', linestyle=':')
+    
+    # Добавление давления, если колонка существует
+    if pressure_col in data.columns:
+        # Делим на 10 для лучшего масштабирования на графике
+        ax2.plot(dates, data[pressure_col].iloc[-len(predictions):].values / 10, 
+                label=f"{pressure_col} / 10", color='green', linestyle=':')
     
     # Настройка второй оси Y
     ax2.set_ylabel('Значение')
@@ -216,7 +284,7 @@ def make_predictions(model, data, seq_length=5, future_steps=24):
     
     Args:
         model: Обученная модель Keras
-        data: DataFrame с данными, содержащий колонки 'Radon (Bq.m3)', 'Temperature (°C)', 'Pressure (mBar)'
+        data: DataFrame с данными
         seq_length: Длина входной последовательности (должна соответствовать обученной модели)
         future_steps: Количество шагов для прогноза в будущее
         
@@ -224,9 +292,38 @@ def make_predictions(model, data, seq_length=5, future_steps=24):
         predictions: Массив прогнозов для имеющихся данных
         future_predictions: Массив прогнозов на future_steps шагов вперед
     """
+    # Проверка и нормализация названий колонок
+    columns = data.columns
+    
+    # Определение названий колонок для радона, температуры и давления
+    radon_col = None
+    temp_col = None
+    pressure_col = None
+    
+    # Поиск подходящих колонок
+    for col in columns:
+        col_lower = col.lower()
+        if 'radon' in col_lower:
+            radon_col = col
+        elif 'temp' in col_lower:
+            temp_col = col
+        elif 'pressure' in col_lower or 'давлен' in col_lower:
+            pressure_col = col
+    
+    # Проверка наличия необходимых колонок
+    if not all([radon_col, temp_col, pressure_col]):
+        missing = []
+        if not radon_col: missing.append("радона")
+        if not temp_col: missing.append("температуры")
+        if not pressure_col: missing.append("давления")
+        raise ValueError(f"Не найдены колонки для: {', '.join(missing)}. "
+                        f"Доступные колонки: {', '.join(columns)}")
+    
+    print(f"Используются колонки: радон='{radon_col}', температура='{temp_col}', давление='{pressure_col}'")
+    
     # Подготовка данных
     scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data[['Radon (Bq.m3)', 'Temperature (°C)', 'Pressure (mBar)']].values)
+    scaled_data = scaler.fit_transform(data[[radon_col, temp_col, pressure_col]].values)
     
     # Создание последовательностей для прогнозирования
     X, y = create_sequences(scaled_data, seq_length)
@@ -317,13 +414,42 @@ def predict_radon_levels(model_path, data):
         from tensorflow.keras.models import load_model
         model = load_model(model_path)
         
-        # Создание прогнозов
-        predictions, future_predictions = make_predictions(model, data)
+        # Определение названий колонок для радона, температуры и давления
+        columns = data.columns
+        radon_col = None
+        temp_col = None
+        pressure_col = None
         
-        # Создание интерактивного графика
-        fig = plot_predictions(data, predictions, future_predictions)
+        # Поиск подходящих колонок
+        for col in columns:
+            col_lower = col.lower()
+            if 'radon' in col_lower:
+                radon_col = col
+            elif 'temp' in col_lower:
+                temp_col = col
+            elif 'pressure' in col_lower or 'давлен' in col_lower:
+                pressure_col = col
+        
+        # Если не нашли, используем первые три колонки
+        if radon_col is None and len(columns) > 0:
+            radon_col = columns[0]
+        if temp_col is None and len(columns) > 1:
+            temp_col = columns[1]
+        if pressure_col is None and len(columns) > 2:
+            pressure_col = columns[2]
+        
+        print(f"Используются колонки: радон='{radon_col}', температура='{temp_col}', давление='{pressure_col}'")
+        
+        # Создание прогнозов с указанием обнаруженных колонок
+        predictions, future_predictions = make_predictions(model, data, seq_length=5, future_steps=24)
+        
+        # Создание интерактивного графика с указанием колонок
+        fig = plot_predictions(data, predictions, future_predictions, 
+                             radon_col=radon_col, temp_col=temp_col, pressure_col=pressure_col)
         
         return predictions, future_predictions, fig
     except Exception as e:
         print(f"Ошибка при прогнозировании: {e}")
+        import traceback
+        traceback.print_exc()
         return None, None, None 
