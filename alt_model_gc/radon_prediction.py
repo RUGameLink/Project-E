@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.preprocessing import MinMaxScaler
+import tensorflow as tf
+from tensorflow.keras.models import load_model
 
 
 def create_sequences_for_prediction(data, seq_length):
@@ -56,79 +58,91 @@ def make_future_prediction(model, last_sequence, scaler, steps=24):
     return future_predictions
 
 
-def plot_predictions(data, predictions, future_predictions=None, n_past=100):
-    """Интерактивная визуализация фактических данных и прогнозов с помощью Plotly."""
-    # Создание фигуры
-    fig = go.Figure()
+def plot_predictions(data, predictions, future_predictions=None):
+    """Визуализация прогнозов с использованием Plotly."""
+    # Подготовка данных для визуализации
+    dates = data.index[-len(predictions):]
+    actual = data['Radon (Bq.m3)'].iloc[-len(predictions):].values
     
-    # Отображение фактических значений
-    fig.add_trace(go.Scatter(
-        x=data.index[-n_past:], 
-        y=data['Radon (Bq.m3)'].values[-n_past:],
-        mode='lines',
-        name='Фактический уровень радона',
-        line=dict(color='blue', width=2)
-    ))
+    # Создание фигуры с двумя y-осями
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Отображение прогнозируемых значений
-    if predictions is not None:
-        fig.add_trace(go.Scatter(
-            x=data.index[-len(predictions):], 
-            y=predictions,
-            mode='lines',
-            name='Прогнозируемый уровень радона',
-            line=dict(color='red', width=2)
-        ))
+    # Добавление линии фактических значений
+    fig.add_trace(
+        go.Scatter(x=dates, y=actual, name="Фактический уровень радона", line=dict(color='blue')),
+        secondary_y=False,
+    )
     
-    # Отображение будущих прогнозов
-    if future_predictions is not None:
-        # Создание будущих дат
-        last_date = data.index[-1]
-        future_dates = pd.date_range(start=last_date, periods=len(future_predictions)+1, freq='H')[1:]
+    # Добавление линии прогнозов
+    fig.add_trace(
+        go.Scatter(x=dates, y=predictions, name="Прогнозируемый уровень радона", line=dict(color='red')),
+        secondary_y=False,
+    )
+    
+    # Добавление температуры
+    fig.add_trace(
+        go.Scatter(x=dates, y=data['Temperature (°C)'].iloc[-len(predictions):].values, name="Температура (°C)", 
+                  line=dict(color='orange', dash='dot')),
+        secondary_y=True,
+    )
+    
+    # Добавление давления
+    fig.add_trace(
+        go.Scatter(x=dates, y=data['Pressure (mBar)'].iloc[-len(predictions):].values / 10, name="Давление / 10 (mBar)", 
+                  line=dict(color='green', dash='dot')),
+        secondary_y=True,
+    )
+    
+    # Если есть прогнозы на будущее, добавляем их
+    if future_predictions is not None and len(future_predictions) > 0:
+        # Создаем даты для будущих прогнозов
+        last_date = dates[-1]
         
-        fig.add_trace(go.Scatter(
-            x=future_dates, 
-            y=future_predictions,
-            mode='lines+markers',
-            name='Прогноз на будущее',
-            line=dict(color='green', width=2, dash='dash')
-        ))
+        # Исправление для предотвращения ошибки с Timestamp
+        if isinstance(last_date, pd.Timestamp):
+            # Определим частоту данных из существующего индекса
+            freq = pd.infer_freq(data.index)
+            if freq is None:
+                # Если не удалось определить частоту, предположим часовой интервал
+                freq = 'H'
+            
+            # Создаем новые даты с правильным интервалом
+            future_dates = pd.date_range(start=last_date + pd.Timedelta(hours=1), 
+                                         periods=len(future_predictions), 
+                                         freq=freq)
+        else:
+            # Для неиндексированных данных
+            future_dates = [last_date + i + 1 for i in range(len(future_predictions))]
         
-        # Добавление вертикальной линии для разделения фактических данных и прогнозов
-        fig.add_vline(
-            x=last_date, 
-            line=dict(color='black', width=1, dash='dash'),
-            annotation_text="Будущее",
-            annotation_position="top right"
+        # Добавляем будущие прогнозы на график
+        fig.add_trace(
+            go.Scatter(x=future_dates, y=future_predictions, name="Прогноз на будущее", 
+                      line=dict(color='purple', dash='dash')),
+            secondary_y=False,
         )
     
     # Обновление макета
     fig.update_layout(
-        title='Прогнозирование уровня радона',
-        xaxis_title='Дата',
-        yaxis_title='Уровень радона (Бк/м³)',
-        hovermode='x unified',
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        ),
-        template='plotly_white',
+        title="Прогнозирование уровня радона",
+        xaxis_title="Дата",
+        legend=dict(y=0.99, x=0.01, orientation="h"),
+        hovermode="x unified",
         height=600,
-        width=1000
     )
     
-    # Добавление ползунка диапазона
+    # Настройка осей Y
+    fig.update_yaxes(title_text="Уровень радона (Бк/м³)", secondary_y=False)
+    fig.update_yaxes(title_text="Значение", secondary_y=True)
+    
+    # Добавление ползунка и кнопок для выбора диапазона
     fig.update_layout(
         xaxis=dict(
             rangeselector=dict(
                 buttons=list([
-                    dict(count=1, label="1д", step="day", stepmode="backward"),
-                    dict(count=7, label="1н", step="day", stepmode="backward"),
-                    dict(count=1, label="1м", step="month", stepmode="backward"),
-                    dict(step="all", label="Все")
+                    dict(count=1, label="1 день", step="day", stepmode="backward"),
+                    dict(count=7, label="1 неделя", step="day", stepmode="backward"),
+                    dict(count=1, label="1 месяц", step="month", stepmode="backward"),
+                    dict(step="all")
                 ])
             ),
             rangeslider=dict(visible=True),
@@ -136,74 +150,164 @@ def plot_predictions(data, predictions, future_predictions=None, n_past=100):
         )
     )
     
-    # Возвращение фигуры
     return fig
 
 
-def plot_predictions_static(data, predictions, future_predictions=None, n_past=100):
-    """Статическая визуализация фактических данных и прогнозов с помощью Matplotlib."""
-    plt.figure(figsize=(14, 7))
+def plot_predictions_static(data, predictions, future_predictions=None):
+    """Статическая визуализация прогнозов с использованием Matplotlib."""
+    # Подготовка данных для визуализации
+    dates = data.index[-len(predictions):]
+    actual = data['Radon (Bq.m3)'].iloc[-len(predictions):].values
     
-    # Отображение фактических значений
-    plt.plot(data.index[-n_past:], data['Radon (Bq.m3)'].values[-n_past:], 
-             'b-', label='Фактический уровень радона')
+    plt.figure(figsize=(14, 8))
     
-    # Отображение прогнозируемых значений
-    if predictions is not None:
-        plt.plot(data.index[-len(predictions):], predictions, 
-                 'r-', label='Прогнозируемый уровень радона')
+    # Построение графиков на основной оси Y
+    plt.plot(dates, actual, label='Фактический уровень радона', color='blue')
+    plt.plot(dates, predictions, label='Прогнозируемый уровень радона', color='red')
     
-    # Отображение будущих прогнозов
-    if future_predictions is not None:
-        # Создание будущих дат
-        last_date = data.index[-1]
-        future_dates = pd.date_range(start=last_date, periods=len(future_predictions)+1, freq='H')[1:]
+    # Если есть прогнозы на будущее, добавляем их
+    if future_predictions is not None and len(future_predictions) > 0:
+        # Создаем даты для будущих прогнозов
+        last_date = dates[-1]
         
-        plt.plot(future_dates, future_predictions, 'g--', label='Прогноз на будущее')
+        # Исправление для предотвращения ошибки с Timestamp
+        if isinstance(last_date, pd.Timestamp):
+            # Определим частоту данных из существующего индекса
+            freq = pd.infer_freq(data.index)
+            if freq is None:
+                # Если не удалось определить частоту, предположим часовой интервал
+                freq = 'H'
+            
+            # Создаем новые даты с правильным интервалом
+            future_dates = pd.date_range(start=last_date + pd.Timedelta(hours=1), 
+                                         periods=len(future_predictions), 
+                                         freq=freq)
+        else:
+            # Для неиндексированных данных
+            future_dates = [last_date + i + 1 for i in range(len(future_predictions))]
         
-        # Добавление вертикальной линии для разделения фактических данных и прогнозов
-        plt.axvline(x=last_date, color='k', linestyle='--')
-        plt.text(last_date, plt.ylim()[1]*0.9, 'Будущее', ha='right')
-        plt.text(future_dates[0], plt.ylim()[1]*0.9, 'Будущее', ha='left')
+        plt.plot(future_dates, future_predictions, label='Прогноз на будущее', color='purple', linestyle='--')
     
     plt.title('Прогнозирование уровня радона')
     plt.xlabel('Дата')
     plt.ylabel('Уровень радона (Бк/м³)')
-    plt.legend()
+    plt.legend(loc='upper left')
+    plt.grid(True)
+    
+    # Создание второй оси Y для температуры и давления
+    ax2 = plt.gca().twinx()
+    ax2.plot(dates, data['Temperature (°C)'].iloc[-len(predictions):].values, 
+             label='Температура (°C)', color='orange', linestyle=':')
+    ax2.plot(dates, data['Pressure (mBar)'].iloc[-len(predictions):].values / 10, 
+             label='Давление / 10 (mBar)', color='green', linestyle=':')
+    
+    # Настройка второй оси Y
+    ax2.set_ylabel('Значение')
+    ax2.legend(loc='upper right')
+    
     plt.tight_layout()
+    plt.savefig('radon_prediction_result.png', dpi=300)
     plt.show()
 
 
-def make_predictions(model, data, seq_length=5):
-    """Создание прогнозов на основе существующих данных и прогнозов на будущее."""
-    # Масштабирование данных
+def make_predictions(model, data, seq_length=5, future_steps=24):
+    """
+    Генерирует прогнозы и будущие прогнозы на основе обученной модели.
+    
+    Args:
+        model: Обученная модель Keras
+        data: DataFrame с данными, содержащий колонки 'Radon (Bq.m3)', 'Temperature (°C)', 'Pressure (mBar)'
+        seq_length: Длина входной последовательности (должна соответствовать обученной модели)
+        future_steps: Количество шагов для прогноза в будущее
+        
+    Returns:
+        predictions: Массив прогнозов для имеющихся данных
+        future_predictions: Массив прогнозов на future_steps шагов вперед
+    """
+    # Подготовка данных
     scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data)
+    scaled_data = scaler.fit_transform(data[['Radon (Bq.m3)', 'Temperature (°C)', 'Pressure (mBar)']].values)
     
     # Создание последовательностей для прогнозирования
-    X_sequences = create_sequences_for_prediction(scaled_data, seq_length)
-    print(f"Создано {len(X_sequences)} последовательностей для прогнозирования")
+    X, y = create_sequences(scaled_data, seq_length)
     
-    # Прогнозирование на всех последовательностях
-    print("Выполнение прогнозирования...")
-    predictions = model.predict(X_sequences)
+    # Прогнозирование
+    scaled_predictions = model.predict(X)
     
-    # Обратное преобразование масштаба прогнозов
-    print("Преобразование прогнозов обратно в исходный масштаб...")
-    unscaled_predictions = np.zeros((len(predictions), 3))
-    unscaled_predictions[:, 0] = predictions.flatten()
-    unscaled_predictions = scaler.inverse_transform(unscaled_predictions)[:, 0]
+    # Обратное преобразование прогнозов
+    dummy_array = np.zeros((len(scaled_predictions), 3))
+    dummy_array[:, 0] = scaled_predictions.flatten()
+    predictions = scaler.inverse_transform(dummy_array)[:, 0]
     
-    # Прогнозирование на будущее (следующие 24 часа)
-    print("Создание прогнозов на будущее...")
-    future_pred = make_future_prediction(
-        model, 
-        X_sequences[-1], 
-        scaler, 
-        steps=24
-    )
+    # Генерация прогнозов на будущее
+    future_predictions = make_future_prediction(model, scaled_data, scaler, seq_length, future_steps)
     
-    return unscaled_predictions, future_pred
+    print(f"Создано {len(predictions)} прогнозов для существующих данных")
+    print(f"Создано {len(future_predictions)} прогнозов на будущее")
+    
+    return predictions, future_predictions
+
+
+def create_sequences(data, seq_length):
+    """Создание последовательностей для прогнозирования временных рядов."""
+    X, y = [], []
+    for i in range(len(data) - seq_length):
+        X.append(data[i:(i + seq_length), 1:])  # Только температура и давление
+        y.append(data[i + seq_length, 0])       # Уровень радона
+    return np.array(X), np.array(y)
+
+
+def make_future_prediction(model, scaled_data, scaler, seq_length, future_steps):
+    """
+    Генерирует прогнозы на несколько шагов вперед.
+    
+    Args:
+        model: Обученная модель
+        scaled_data: Масштабированные данные
+        scaler: Объект MinMaxScaler для обратного преобразования
+        seq_length: Длина входной последовательности
+        future_steps: Количество шагов для прогноза в будущее
+        
+    Returns:
+        future_predictions: Массив прогнозов на future_steps шагов вперед
+    """
+    # Последняя доступная последовательность
+    last_sequence = scaled_data[-seq_length:].copy()
+    
+    # Массив для будущих прогнозов
+    future_predictions = []
+    
+    # Генерация прогнозов
+    current_sequence = last_sequence.copy()
+    
+    for _ in range(future_steps):
+        # Подготовка входных данных для модели (только температура и давление)
+        X_future = current_sequence[:, 1:].reshape(1, seq_length, 2)
+        
+        # Прогнозирование
+        next_pred = model.predict(X_future, verbose=0)[0][0]
+        
+        # Создание строки с прогнозом (копируем последние значения температуры и давления)
+        next_point = np.zeros(3)
+        next_point[0] = next_pred
+        next_point[1:] = current_sequence[-1, 1:]  # Используем последние значения темп. и давления
+        
+        # Обратное преобразование прогноза
+        dummy_array = np.zeros((1, 3))
+        dummy_array[0] = next_point
+        next_point_inverse = scaler.inverse_transform(dummy_array)[0, 0]
+        
+        # Добавление прогноза в результаты
+        future_predictions.append(next_point_inverse)
+        
+        # Обновление последовательности для следующего шага
+        # Удаляем первую точку и добавляем новую в конец
+        new_seq = np.zeros_like(current_sequence)
+        new_seq[:-1] = current_sequence[1:]
+        new_seq[-1] = next_point
+        current_sequence = new_seq
+    
+    return np.array(future_predictions)
 
 
 def predict_radon_levels(model_path, data):
