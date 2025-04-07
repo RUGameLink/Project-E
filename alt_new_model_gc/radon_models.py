@@ -19,6 +19,8 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from tensorflow.keras import regularizers
 from tensorflow.keras.models import Model
+from tensorflow.keras.losses import mean_squared_error
+import tensorflow.keras.backend as K
 
 
 def create_sequences(data, seq_length):
@@ -54,6 +56,7 @@ def prepare_data(data, seq_length=10, test_size=0.2, random_state=42, scaler_typ
 
 def create_model(input_shape, model_type='lstm', l2_reg=0.001):
     """Создание модели указанной архитектуры."""
+    from tensorflow.keras.losses import mean_squared_error
     
     if model_type == 'lstm':
         model = Sequential()
@@ -148,7 +151,7 @@ def create_model(input_shape, model_type='lstm', l2_reg=0.001):
         # Создание модели
         model = Model(inputs=input_layer, outputs=output)
         
-    model.compile(optimizer=Adam(learning_rate=0.001), loss='mse')
+    model.compile(optimizer=Adam(learning_rate=0.001), loss=mean_squared_error)
     model.summary()
     return model
 
@@ -224,8 +227,24 @@ def evaluate_model(model, X_test, y_test, scaler):
     return y_pred_inverse, y_test_inverse, mse, rmse, mae, r2
 
 
-def save_model_and_history(model, history, model_type):
-    """Сохранение модели и истории обучения с меткой времени."""
+def save_model_and_history(model, history, model_type, save_dir=None):
+    """
+    Сохранение модели и истории обучения с меткой времени.
+    
+    Args:
+        model: Обученная модель Keras
+        history: История обучения
+        model_type: Тип модели ('lstm', 'gru', и т.д.)
+        save_dir: Директория для сохранения (если None, будет использоваться ./saved_models)
+    
+    Returns:
+        model_path: Путь к сохраненной модели
+        history_path: Путь к сохраненной истории обучения
+    """
+    from tensorflow.keras.losses import mean_squared_error
+    import tensorflow.keras.backend as K
+    import os
+    
     # Создание метки даты и времени
     now = datetime.datetime.now()
     date_str = now.strftime("%Y%m%d")
@@ -235,16 +254,37 @@ def save_model_and_history(model, history, model_type):
     model_filename = f"model_{model_type}_{date_str}_{time_str}"
     history_filename = f"history_{model_type}_{date_str}_{time_str}"
     
-    # Создание директории для сохранения, если она не существует
-    os.makedirs("saved_models", exist_ok=True)
+    # Определение директории для сохранения
+    if save_dir is None:
+        # Для Google Colab проверяем, подключен ли Google Drive
+        try:
+            from google.colab import drive
+            # Проверка, смонтирован ли уже диск
+            is_mounted = os.path.exists('/content/drive/MyDrive')
+            if not is_mounted:
+                print("Монтирование Google Drive...")
+                drive.mount('/content/drive')
+                
+            # Используем папку в Google Drive
+            save_dir = "/content/drive/MyDrive/saved_models"
+            print(f"Сохранение в Google Drive: {save_dir}")
+        except ImportError:
+            # Если не в Colab, используем локальную директорию
+            save_dir = "saved_models"
+            print(f"Сохранение локально: {save_dir}")
     
-    # Сохранение модели
-    model_path = os.path.join("saved_models", f"{model_filename}.h5")
-    save_model(model, model_path)
+    # Создание директории для сохранения, если она не существует
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # Сохранение модели в формате h5
+    model_path = os.path.join(save_dir, f"{model_filename}.h5")
+    
+    # Сохраняем модель с указанием custom_objects для корректной загрузки
+    save_model(model, model_path, save_format='h5')
     print(f"Модель сохранена в {model_path}")
     
     # Сохранение истории обучения
-    history_path = os.path.join("saved_models", f"{history_filename}.json")
+    history_path = os.path.join(save_dir, f"{history_filename}.json")
     with open(history_path, 'w') as f:
         json.dump({key: [float(x) for x in value] for key, value in history.history.items()}, f)
     print(f"История обучения сохранена в {history_path}")
@@ -253,8 +293,27 @@ def save_model_and_history(model, history, model_type):
 
 
 def train_models(X_train, y_train, epochs=100, batch_size=32, validation_split=0.2, save_models=True, 
-                model_types=None, l2_reg=0.001):
-    """Обучение нескольких типов моделей и возврат лучшей из них."""
+                model_types=None, l2_reg=0.001, save_dir=None):
+    """
+    Обучение нескольких типов моделей и возврат лучшей из них.
+    
+    Args:
+        X_train: Входные данные для обучения
+        y_train: Целевые значения для обучения
+        epochs: Максимальное количество эпох обучения
+        batch_size: Размер батча
+        validation_split: Доля данных для валидации
+        save_models: Сохранять ли модели после обучения
+        model_types: Список типов моделей для обучения
+        l2_reg: Коэффициент L2-регуляризации
+        save_dir: Директория для сохранения моделей (если None, используется логика из save_model_and_history)
+        
+    Returns:
+        models: Словарь всех обученных моделей
+        histories: Словарь историй обучения
+        best_model: Лучшая модель по валидационной ошибке
+        saved_paths: Пути к сохраненным моделям и историям
+    """
     if model_types is None:
         model_types = ['lstm', 'gru', 'bidirectional', 'cnn_lstm', 'ensemble']
     
@@ -279,7 +338,7 @@ def train_models(X_train, y_train, epochs=100, batch_size=32, validation_split=0
         
         # Сохранение модели и истории, если требуется
         if save_models:
-            model_path, history_path = save_model_and_history(model, history, model_type)
+            model_path, history_path = save_model_and_history(model, history, model_type, save_dir=save_dir)
             saved_paths[model_type] = {
                 'model': model_path,
                 'history': history_path
@@ -298,8 +357,23 @@ def train_models(X_train, y_train, epochs=100, batch_size=32, validation_split=0
         now = datetime.datetime.now()
         date_str = now.strftime("%Y%m%d")
         time_str = now.strftime("%H%M")
-        best_model_path = os.path.join("saved_models", f"model_{best_model_type}_best_{date_str}_{time_str}.h5")
-        save_model(models[best_model_type], best_model_path)
+        
+        # Определение директории для сохранения если она не указана
+        if save_dir is None:
+            # Для Google Colab проверяем, подключен ли Google Drive
+            try:
+                from google.colab import drive
+                # Используем папку в Google Drive
+                save_dir = "/content/drive/MyDrive/saved_models"
+            except ImportError:
+                # Если не в Colab, используем локальную директорию
+                save_dir = "saved_models"
+        
+        # Создание директории для сохранения, если она не существует
+        os.makedirs(save_dir, exist_ok=True)
+        
+        best_model_path = os.path.join(save_dir, f"model_{best_model_type}_best_{date_str}_{time_str}.h5")
+        save_model(models[best_model_type], best_model_path, save_format='h5')
         print(f"Лучшая модель сохранена в {best_model_path}")
         saved_paths['best'] = best_model_path
     

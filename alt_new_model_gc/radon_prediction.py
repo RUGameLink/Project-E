@@ -13,6 +13,9 @@ import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+from tensorflow.keras.losses import mean_squared_error
+from tensorflow.keras.metrics import mean_squared_error as mse
+import os
 
 
 def create_sequences_for_prediction(data, seq_length):
@@ -581,8 +584,50 @@ def plot_feature_importance(model, data, seq_length=10):
 def predict_radon_levels(model_path, data, use_monte_carlo=True, plot_theme='plotly_white'):
     """Загрузка модели и создание прогнозов с визуализацией."""
     try:
-        # Загрузка модели
-        model = load_model(model_path)
+        # Пытаемся загрузить модель из указанного пути
+        try:
+            # Проверка существования файла
+            if not os.path.exists(model_path):
+                # Если путь не существует, пробуем искать на Google Drive
+                try:
+                    from google.colab import drive
+                    # Проверяем, смонтирован ли Google Drive
+                    is_mounted = os.path.exists('/content/drive/MyDrive')
+                    
+                    if not is_mounted:
+                        print("Монтирование Google Drive...")
+                        drive.mount('/content/drive')
+                    
+                    # Проверяем наличие директории с моделями в Google Drive
+                    drive_model_path = os.path.join('/content/drive/MyDrive/saved_models', 
+                                                 os.path.basename(model_path))
+                    
+                    if os.path.exists(drive_model_path):
+                        print(f"Модель найдена в Google Drive: {drive_model_path}")
+                        model_path = drive_model_path
+                    else:
+                        # Пробуем найти любую подходящую модель в Google Drive
+                        drive_models_dir = '/content/drive/MyDrive/saved_models'
+                        if os.path.exists(drive_models_dir):
+                            models = [f for f in os.listdir(drive_models_dir) if f.endswith('.h5')]
+                            if models:
+                                model_path = os.path.join(drive_models_dir, models[0])
+                                print(f"Используется модель из Google Drive: {model_path}")
+                        
+                except ImportError:
+                    print("Google Colab не обнаружен, продолжаем с исходным путем.")
+            
+            # Загрузка модели с указанием custom_objects
+            from tensorflow.keras.losses import mean_squared_error
+            from tensorflow.keras.metrics import mean_squared_error as mse
+            
+            model = load_model(model_path, custom_objects={
+                'mse': mse,
+                'mean_squared_error': mean_squared_error
+            })
+        except Exception as e:
+            print(f"Ошибка загрузки модели: {str(e)}")
+            raise
         
         # Определение названий колонок
         columns = data.columns

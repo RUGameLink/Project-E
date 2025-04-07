@@ -215,6 +215,72 @@ fig_pred.show()
 fig_importance.show()
 ```
 
+## Сохранение и загрузка моделей через Google Drive
+
+В обновленной версии нашего кода добавлена возможность автоматического сохранения моделей на Google Drive. Это позволяет сохранять результаты работы даже при отключении сессии Colab.
+
+### Сохранение моделей на Google Drive
+
+```python
+# Подключение Google Drive
+from google.colab import drive
+drive.mount('/content/drive')
+
+# Импорт необходимых модулей
+from radon_models import train_models, prepare_data
+
+# Подготовка данных
+X, y, X_train, X_test, y_train, y_test, scaler = prepare_data(data, seq_length=10)
+
+# Обучение моделей с сохранением на Google Drive
+save_dir = "/content/drive/MyDrive/saved_models"
+models, histories, best_model, saved_paths = train_models(
+    X_train, 
+    y_train, 
+    epochs=100, 
+    batch_size=32, 
+    save_models=True,
+    model_types=['lstm', 'gru'],  # можно указать только нужные модели
+    save_dir=save_dir  # путь для сохранения на Google Drive
+)
+
+print("Пути к сохраненным моделям:", saved_paths)
+```
+
+### Загрузка моделей с Google Drive и прогнозирование
+
+```python
+# Подключение Google Drive (если еще не подключен)
+from google.colab import drive
+drive.mount('/content/drive')
+
+# Импорт функции прогнозирования
+from radon_prediction import predict_radon_levels
+
+# Путь к модели на Google Drive
+model_path = "/content/drive/MyDrive/saved_models/model_lstm_best_20240422_1045.h5"
+
+# Если модель не найдена по указанному пути, 
+# функция автоматически попытается найти модели на Google Drive
+predictions, future_predictions, prediction_bounds, fig, fig_importance = predict_radon_levels(
+    model_path, 
+    data, 
+    use_monte_carlo=True
+)
+
+# Вывод интерактивных графиков
+fig.show()
+fig_importance.show()
+```
+
+### Советы по работе с Google Drive
+
+1. **Монтирование диска**: При первом использовании потребуется авторизация.
+2. **Пути к файлам**: Используйте путь `/content/drive/MyDrive/...` для доступа к файлам.
+3. **Сохранение структуры**: Функции создадут директорию `saved_models` автоматически.
+4. **Отключение сессии**: Даже если сессия Colab завершится, модели останутся сохраненными на вашем Google Drive.
+5. **Совместное использование**: Вы можете открыть доступ к папке с моделями другим пользователям через интерфейс Google Drive.
+
 ## Советы по работе в Google Colab
 
 1. **Сохранение файлов**: Colab автоматически очищает файлы после отключения сессии. Если вы хотите сохранить обученные модели или результаты, загрузите их или сохраните на Google Drive:
