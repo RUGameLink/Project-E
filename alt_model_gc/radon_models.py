@@ -1,12 +1,15 @@
 """
-Radon Prediction Models Module
+Модуль моделей прогнозирования уровня радона
 
-This module contains functions for creating, training, and evaluating neural network models
-for radon level prediction based on temperature and pressure data.
+Этот модуль содержит функции для создания, обучения и оценки нейронных сетей
+для прогнозирования уровня радона на основе данных о температуре и давлении.
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import datetime
+import json
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
@@ -17,34 +20,34 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
 def create_sequences(data, seq_length):
-    """Create sequences for time series prediction."""
+    """Создание последовательностей для прогнозирования временных рядов."""
     X, y = [], []
     for i in range(len(data) - seq_length):
-        X.append(data[i:(i + seq_length), 1:])  # Only temperature and pressure
-        y.append(data[i + seq_length, 0])       # Radon level
+        X.append(data[i:(i + seq_length), 1:])  # Только температура и давление
+        y.append(data[i + seq_length, 0])       # Уровень радона
     return np.array(X), np.array(y)
 
 
 def prepare_data(data, seq_length=5, test_size=0.2, random_state=42):
-    """Prepare data for model training."""
-    # Scale data
+    """Подготовка данных для обучения модели."""
+    # Масштабирование данных
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data)
     
-    # Create sequence data
+    # Создание последовательностей
     X, y = create_sequences(scaled_data, seq_length)
-    print(f"Sequence data shape: X: {X.shape}, y: {y.shape}")
+    print(f"Размерность последовательностей: X: {X.shape}, y: {y.shape}")
     
-    # Split data
+    # Разделение данных
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-    print(f"Train data shape: X_train: {X_train.shape}, y_train: {y_train.shape}")
-    print(f"Test data shape: X_test: {X_test.shape}, y_test: {y_test.shape}")
+    print(f"Размерность обучающих данных: X_train: {X_train.shape}, y_train: {y_train.shape}")
+    print(f"Размерность тестовых данных: X_test: {X_test.shape}, y_test: {y_test.shape}")
     
     return X, y, X_train, X_test, y_train, y_test, scaler
 
 
 def create_model(input_shape, model_type='lstm'):
-    """Create model with specified architecture."""
+    """Создание модели указанной архитектуры."""
     model = Sequential()
     
     if model_type == 'lstm':
@@ -71,13 +74,13 @@ def create_model(input_shape, model_type='lstm'):
 
 
 def train_model(model, X_train, y_train, model_type, epochs=50, batch_size=32, validation_split=0.2):
-    """Train a neural network model."""
-    # Callbacks for early stopping and model checkpoint
+    """Обучение нейронной сети."""
+    # Колбэки для раннего останова и сохранения лучшей модели
     callbacks = [
         EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
     ]
     
-    # Train the model
+    # Обучение модели
     history = model.fit(
         X_train, y_train,
         epochs=epochs,
@@ -87,13 +90,13 @@ def train_model(model, X_train, y_train, model_type, epochs=50, batch_size=32, v
         verbose=1
     )
     
-    # Plot training history
+    # Построение графика истории обучения
     plt.figure(figsize=(10, 6))
-    plt.plot(history.history['loss'], label='Training Loss')
-    plt.plot(history.history['val_loss'], label='Validation Loss')
-    plt.title(f'{model_type.upper()} Model Training History')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss (MSE)')
+    plt.plot(history.history['loss'], label='Ошибка на обучающем наборе')
+    plt.plot(history.history['val_loss'], label='Ошибка на валидационном наборе')
+    plt.title(f'История обучения модели {model_type.upper()}')
+    plt.xlabel('Эпохи')
+    plt.ylabel('Функция потерь (MSE)')
     plt.legend()
     plt.show()
     
@@ -101,11 +104,11 @@ def train_model(model, X_train, y_train, model_type, epochs=50, batch_size=32, v
 
 
 def evaluate_model(model, X_test, y_test, scaler):
-    """Evaluate model and print metrics."""
-    # Make predictions
+    """Оценка модели и вывод метрик."""
+    # Создание прогнозов
     y_pred = model.predict(X_test)
     
-    # Create a dummy array with zeros for temperature and pressure
+    # Создание фиктивного массива с нулями для температуры и давления
     dummy_array = np.zeros((len(y_pred), 3))
     dummy_array[:, 0] = y_pred.flatten()
     y_pred_inverse = scaler.inverse_transform(dummy_array)[:, 0]
@@ -114,38 +117,67 @@ def evaluate_model(model, X_test, y_test, scaler):
     dummy_array[:, 0] = y_test
     y_test_inverse = scaler.inverse_transform(dummy_array)[:, 0]
     
-    # Calculate metrics
+    # Расчет метрик
     mse = mean_squared_error(y_test_inverse, y_pred_inverse)
     rmse = np.sqrt(mse)
     mae = mean_absolute_error(y_test_inverse, y_pred_inverse)
     r2 = r2_score(y_test_inverse, y_pred_inverse)
     
-    print(f"Mean Squared Error (MSE): {mse:.2f}")
-    print(f"Root Mean Squared Error (RMSE): {rmse:.2f}")
-    print(f"Mean Absolute Error (MAE): {mae:.2f}")
-    print(f"R² Score: {r2:.4f}")
+    print(f"Среднеквадратичная ошибка (MSE): {mse:.2f}")
+    print(f"Корень из среднеквадратичной ошибки (RMSE): {rmse:.2f}")
+    print(f"Средняя абсолютная ошибка (MAE): {mae:.2f}")
+    print(f"Коэффициент детерминации (R²): {r2:.4f}")
     
-    # Plot predictions against actual values
+    # Построение графика прогнозов против фактических значений
     plt.figure(figsize=(12, 6))
-    plt.plot(y_test_inverse[:100], label='Actual Radon Levels')
-    plt.plot(y_pred_inverse[:100], label='Predicted Radon Levels')
-    plt.title("Model Predictions vs Actual Values")
-    plt.xlabel('Time Steps')
-    plt.ylabel('Radon Level (Bq.m3)')
+    plt.plot(y_test_inverse[:100], label='Фактический уровень радона')
+    plt.plot(y_pred_inverse[:100], label='Прогнозируемый уровень радона')
+    plt.title("Сравнение прогнозов модели с фактическими значениями")
+    plt.xlabel('Временные шаги')
+    plt.ylabel('Уровень радона (Бк/м³)')
     plt.legend()
     plt.show()
     
     return y_pred_inverse, y_test_inverse, mse, rmse, mae, r2
 
 
-def train_models(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2):
-    """Train multiple model types and return the best one."""
+def save_model_and_history(model, history, model_type):
+    """Сохранение модели и истории обучения с меткой времени."""
+    # Создание метки даты и времени
+    now = datetime.datetime.now()
+    date_str = now.strftime("%Y%m%d")
+    time_str = now.strftime("%H%M")
+    
+    # Создание имен файлов
+    model_filename = f"model_{model_type}_{date_str}_{time_str}"
+    history_filename = f"history_{model_type}_{date_str}_{time_str}"
+    
+    # Создание директории для сохранения, если она не существует
+    os.makedirs("saved_models", exist_ok=True)
+    
+    # Сохранение модели
+    model_path = os.path.join("saved_models", f"{model_filename}.h5")
+    save_model(model, model_path)
+    print(f"Модель сохранена в {model_path}")
+    
+    # Сохранение истории обучения
+    history_path = os.path.join("saved_models", f"{history_filename}.json")
+    with open(history_path, 'w') as f:
+        json.dump({key: [float(x) for x in value] for key, value in history.history.items()}, f)
+    print(f"История обучения сохранена в {history_path}")
+    
+    return model_path, history_path
+
+
+def train_models(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, save_models=True):
+    """Обучение нескольких типов моделей и возврат лучшей из них."""
     model_types = ['lstm', 'gru', 'bidirectional']
     models = {}
     histories = {}
+    saved_paths = {}
     
     for model_type in model_types:
-        print(f"\nTraining {model_type.upper()} model...")
+        print(f"\nОбучение модели {model_type.upper()}...")
         model = create_model(input_shape=(X_train.shape[1], X_train.shape[2]), model_type=model_type)
         model, history = train_model(
             model, 
@@ -158,24 +190,42 @@ def train_models(X_train, y_train, epochs=50, batch_size=32, validation_split=0.
         )
         models[model_type] = model
         histories[model_type] = history
+        
+        # Сохранение модели и истории, если требуется
+        if save_models:
+            model_path, history_path = save_model_and_history(model, history, model_type)
+            saved_paths[model_type] = {
+                'model': model_path,
+                'history': history_path
+            }
     
-    # Return all models and the best one based on validation loss
+    # Возврат всех моделей и лучшей на основе валидационной ошибки
     best_model_type = min(
         [(model_type, min(histories[model_type].history['val_loss'])) for model_type in model_types],
         key=lambda x: x[1]
     )[0]
     
-    print(f"\nBest model based on validation loss: {best_model_type.upper()}")
+    print(f"\nЛучшая модель по валидационной ошибке: {best_model_type.upper()}")
     
-    return models, histories, models[best_model_type]
+    # Если сохранение моделей включено, то сохраняем лучшую модель с пометкой "best"
+    if save_models:
+        now = datetime.datetime.now()
+        date_str = now.strftime("%Y%m%d")
+        time_str = now.strftime("%H%M")
+        best_model_path = os.path.join("saved_models", f"model_{best_model_type}_best_{date_str}_{time_str}.h5")
+        save_model(models[best_model_type], best_model_path)
+        print(f"Лучшая модель сохранена в {best_model_path}")
+        saved_paths['best'] = best_model_path
+    
+    return models, histories, models[best_model_type], saved_paths
 
 
 def evaluate_all_models(models, X_test, y_test, scaler):
-    """Evaluate all models and return metrics."""
+    """Оценка всех моделей и вывод метрик."""
     results = {}
     
     for model_type, model in models.items():
-        print(f"\nEvaluating {model_type.upper()} model...")
+        print(f"\nОценка модели {model_type.upper()}...")
         y_pred, y_test_inv, mse, rmse, mae, r2 = evaluate_model(model, X_test, y_test, scaler)
         results[model_type] = {
             'mse': mse,
@@ -184,7 +234,7 @@ def evaluate_all_models(models, X_test, y_test, scaler):
             'r2': r2
         }
     
-    # Compare models with bar charts
+    # Сравнение моделей с помощью столбчатых диаграмм
     metrics = ['mse', 'rmse', 'mae', 'r2']
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     axes = axes.flatten()
@@ -192,15 +242,15 @@ def evaluate_all_models(models, X_test, y_test, scaler):
     for i, metric in enumerate(metrics):
         values = [results[model][metric] for model in models.keys()]
         axes[i].bar(list(models.keys()), values)
-        axes[i].set_title(f'Comparison of {metric.upper()}')
-        axes[i].set_xlabel('Model Type')
+        axes[i].set_title(f'Сравнение {metric.upper()}')
+        axes[i].set_xlabel('Тип модели')
         axes[i].set_ylabel(metric.upper())
         
-        # For R², higher is better, so highlight the maximum
+        # Для R², выше лучше, поэтому выделяем максимум
         if metric == 'r2':
             best_idx = np.argmax(values)
         else:
-            # For error metrics, lower is better, so highlight the minimum
+            # Для метрик ошибок, ниже лучше, поэтому выделяем минимум
             best_idx = np.argmin(values)
             
         axes[i].get_children()[best_idx].set_color('green')

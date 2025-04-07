@@ -1,4 +1,4 @@
-# Radon Prediction Model для Google Colab
+# Модель прогнозирования уровня радона для Google Colab
 
 Этот проект содержит исходные файлы для создания и запуска моделей прогнозирования уровня радона на основе данных о температуре и давлении. Проект оптимизирован для запуска в Google Colab.
 
@@ -16,8 +16,8 @@
 2. Добавьте следующий код для установки необходимых пакетов:
 
 ```python
-# Install required packages
-!pip install numpy pandas matplotlib scikit-learn tensorflow seaborn scipy
+# Установка необходимых пакетов
+!pip install numpy pandas matplotlib scikit-learn tensorflow seaborn scipy plotly
 ```
 
 3. Загрузите исходные файлы из GitHub или загрузите их напрямую в Colab:
@@ -76,8 +76,18 @@ lag_correlations = perform_lag_analysis(data)
 # Подготовка данных
 X, y, X_train, X_test, y_train, y_test, scaler = prepare_data(data)
 
-# Обучение моделей
-models, histories, best_model = train_models(X_train, y_train)
+# Обучение моделей (с сохранением)
+models, histories, best_model, saved_paths = train_models(X_train, y_train)
+
+# Вывод путей сохраненных моделей
+print("\nСохраненные модели и истории обучения:")
+for model_type, paths in saved_paths.items():
+    if model_type != 'best':
+        print(f"{model_type.upper()}:")
+        print(f"  Модель: {paths['model']}")
+        print(f"  История: {paths['history']}")
+    else:
+        print(f"Лучшая модель: {paths}")
 
 # Оценка моделей
 evaluate_all_models(models, X_test, y_test, scaler)
@@ -87,11 +97,58 @@ evaluate_all_models(models, X_test, y_test, scaler)
 
 ```python
 # Прогнозирование
-predictions, future_predictions = make_predictions(best_model, data, X_sequences, scaler)
+predictions, future_predictions = make_predictions(best_model, data)
+
+# Интерактивная визуализация результатов с помощью Plotly
+fig = plot_predictions(data, predictions, future_predictions)
+fig.show()
+
+# Или для статической визуализации
+plot_predictions_static(data, predictions, future_predictions)
+```
+
+9. Загрузка сохраненной модели для прогнозирования:
+
+```python
+# Загрузка сохраненной модели
+from tensorflow.keras.models import load_model
+saved_model_path = "saved_models/model_lstm_best_20230605_1415.h5"  # Укажите путь к вашей сохраненной модели
+loaded_model = load_model(saved_model_path)
+
+# Прогнозирование с использованием загруженной модели
+predictions, future_predictions = make_predictions(loaded_model, data)
 
 # Визуализация результатов
-plot_predictions(data, predictions, future_predictions)
+fig = plot_predictions(data, predictions, future_predictions)
+fig.show()
 ```
+
+## Сохранение моделей и истории обучения
+
+Проект теперь поддерживает автоматическое сохранение моделей и истории их обучения. При обучении каждой модели (LSTM, GRU, BiLSTM) происходит следующее:
+
+1. Все модели сохраняются в формате `.h5` в директории `saved_models` с именем в формате: `model_{rnn_name}_{date}_{time}.h5`
+   - `rnn_name`: тип модели (lstm, gru, bidirectional)
+   - `date`: дата сохранения в формате ГГГГММДД
+   - `time`: время сохранения в формате ЧЧММ
+
+2. История обучения каждой модели сохраняется в формате JSON в файлах вида: `history_{rnn_name}_{date}_{time}.json`
+
+3. Дополнительно, лучшая модель (с наименьшей ошибкой на валидационном наборе) сохраняется с отметкой `best` в имени файла.
+
+Для отключения автоматического сохранения, можно передать параметр `save_models=False` в функцию `train_models`.
+
+## Интерактивная визуализация с Plotly
+
+В проект добавлена поддержка интерактивных графиков с помощью библиотеки Plotly. Функция `plot_predictions` теперь создает интерактивный график с возможностями:
+
+- Наведение курсора для просмотра точных значений
+- Масштабирование и перемещение по графику
+- Ползунок для выбора временного диапазона
+- Кнопки для выбора периода (1 день, 1 неделя, 1 месяц)
+- Сохранение графика в различных форматах
+
+Для статической визуализации по-прежнему доступна функция `plot_predictions_static`.
 
 ## Создание полного блокнота
 
