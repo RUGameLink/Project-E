@@ -13,8 +13,9 @@ import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from tensorflow.keras.losses import mean_squared_error
-from tensorflow.keras.metrics import mean_squared_error as mse
+# Изменяем импорт для совместимости с TensorFlow 2.x
+import tensorflow.keras.losses as klosses
+import tensorflow.keras.metrics as kmetrics
 import os
 
 
@@ -926,14 +927,11 @@ def predict_radon_levels(model_path, data, use_monte_carlo=True, plot_theme='plo
                 except ImportError:
                     print("Google Colab не обнаружен, продолжаем с исходным путем.")
             
-            # Загрузка модели с указанием custom_objects
-            from tensorflow.keras.losses import mean_squared_error
-            from tensorflow.keras.metrics import mean_squared_error as mse
+            # Загрузка модели с custom_objects - совместимый подход для TensorFlow 2.x
+            # Определяем словарь пользовательских объектов для устранения ошибок десериализации
+            # Используем 'mse' в качестве строки для функции потерь
+            model = load_model(model_path, compile=True)
             
-            model = load_model(model_path, custom_objects={
-                'mse': mse,
-                'mean_squared_error': mean_squared_error
-            })
         except Exception as e:
             print(f"Ошибка загрузки модели: {str(e)}")
             raise

@@ -393,4 +393,49 @@ html_path = save_plots_to_html(
 )
 ```
 
-Это позволяет создавать полноценные интерактивные отчеты, которые можно легко передавать коллегам или интегрировать в веб-приложения. 
+Это позволяет создавать полноценные интерактивные отчеты, которые можно легко передавать коллегам или интегрировать в веб-приложения.
+
+## Исправление импортов для TensorFlow 2.x
+
+В последних версиях TensorFlow/Keras произошли изменения в структуре импортов. При возникновении ошибки вида:
+
+```
+ImportError: cannot import name 'mean_squared_error' from 'tensorflow.keras.losses'
+```
+
+Необходимо исправить импорты в файлах проекта:
+
+1. **Для radon_models.py**:
+   ```python
+   # Замените импорт
+   from tensorflow.keras.losses import mean_squared_error
+   
+   # На этот вариант
+   import tensorflow.keras.losses as klosses
+   ```
+
+2. **Для функции create_model**:
+   ```python
+   # Замените
+   model.compile(optimizer=Adam(learning_rate=0.001), loss=mean_squared_error)
+   
+   # На этот вариант
+   model.compile(optimizer=Adam(learning_rate=0.001), loss='mse')
+   ```
+
+3. **Для функции predict_radon_levels в radon_prediction.py**:
+   ```python
+   # Замените
+   from tensorflow.keras.losses import mean_squared_error
+   from tensorflow.keras.metrics import mean_squared_error as mse
+   
+   model = load_model(model_path, custom_objects={
+       'mse': mse,
+       'mean_squared_error': mean_squared_error
+   })
+   
+   # На этот вариант
+   model = load_model(model_path, compile=True)
+   ```
+
+Эти изменения обеспечат совместимость с последними версиями TensorFlow/Keras и устранят ошибки импорта. 
