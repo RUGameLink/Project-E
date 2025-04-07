@@ -310,3 +310,87 @@ fig_importance.show()
    }
    setInterval(ClickConnect, 60000)
    ``` 
+
+## Использование улучшенных визуализаций и HTML-отчетов
+
+В новой версии кода добавлена возможность создания интерактивных визуализаций с помощью Plotly и сохранения результатов в виде HTML-отчетов.
+
+### Создание интерактивных визуализаций
+
+```python
+# Подключение Google Drive
+from google.colab import drive
+drive.mount('/content/drive')
+
+# Загрузка данных
+data = load_data('your_data.csv')
+
+# Получение пути к модели
+model_path = "/content/drive/MyDrive/saved_models/model_lstm_best_20240422_1045.h5"
+
+# Создание прогнозов с визуализацией в стиле Plotly
+predictions, future_predictions, prediction_bounds, fig_pred, fig_importance = predict_radon_levels(
+    model_path, 
+    data, 
+    use_monte_carlo=True,
+    plot_theme='plotly_white'  # Доступны разные темы: 'plotly', 'plotly_dark', 'ggplot2' и др.
+)
+
+# Отображение графиков в Colab
+fig_pred.show()
+fig_importance.show()
+```
+
+### Создание и сохранение HTML-отчета с визуализациями
+
+```python
+# Создание полного отчета с графиками и сохранение в HTML
+predictions, future_predictions, prediction_bounds, fig_pred, fig_importance, html_path = predict_radon_levels(
+    model_path, 
+    data, 
+    use_monte_carlo=True,
+    plot_theme='plotly_white',
+    save_html=True,  # Включение сохранения в HTML
+    html_filename='radon_prediction_report.html'  # Имя выходного файла
+)
+
+print(f"Отчет сохранен в: {html_path}")
+```
+
+HTML-отчет будет автоматически сохранен на Google Drive в папке `/content/drive/MyDrive/radon_reports/` и будет доступен для скачивания. Отчет включает следующие разделы:
+
+1. **Временные ряды признаков** - График с данными радона, температуры и давления
+2. **Прогнозирование уровня радона** - График с фактическими значениями, прогнозами и доверительными интервалами
+3. **Влияние признаков на прогноз** - График, показывающий важность разных временных шагов для прогноза
+4. **Распределение значений радона** - Гистограмма распределения значений уровня радона
+5. **Корреляция между признаками** - Тепловая карта корреляций между признаками
+
+### Создание пользовательских отчетов
+
+Вы также можете создать собственный HTML-отчет с нужным набором графиков:
+
+```python
+# Импорт необходимого модуля
+from radon_prediction import save_plots_to_html
+
+# Создание графиков
+fig1 = plot_time_series(data, plot_type='plotly')
+fig2 = plot_predictions(data, predictions, future_predictions, prediction_bounds)
+fig3 = plot_feature_importance(model, data)
+
+# Объединение графиков в словарь с заголовками разделов
+plots_dict = {
+    "Временные ряды": fig1,
+    "Прогнозы уровня радона": fig2,
+    "Важность признаков": fig3
+}
+
+# Сохранение в HTML с пользовательским заголовком
+html_path = save_plots_to_html(
+    plots_dict,
+    filename='my_custom_report.html',
+    title='Мой отчет по анализу радона'
+)
+```
+
+Это позволяет создавать полноценные интерактивные отчеты, которые можно легко передавать коллегам или интегрировать в веб-приложения. 

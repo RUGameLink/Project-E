@@ -122,7 +122,7 @@ def make_future_prediction(model, last_sequence, scaler, steps=48, use_monte_car
 
 def plot_predictions(data, predictions, future_predictions=None, prediction_bounds=None, 
                     radon_col=None, temp_col=None, pressure_col=None, plot_title="Прогнозирование уровня радона",
-                    plot_theme='plotly', include_components=True):
+                    plot_theme='plotly_white', include_components=True):
     """
     Интерактивная визуализация прогнозов с использованием Plotly.
     
@@ -178,22 +178,39 @@ def plot_predictions(data, predictions, future_predictions=None, prediction_boun
     if plot_theme:
         template = plot_theme
     else:
-        template = "plotly"
+        template = "plotly_white"
     
-    # Создание фигуры с двумя y-осями
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    # Создание фигуры с двумя y-осями и оптимизированным расположением
+    fig = make_subplots(
+        rows=1, 
+        cols=1, 
+        specs=[[{"secondary_y": True}]],
+        subplot_titles=[plot_title]
+    )
     
-    # Добавление линии фактических значений
+    # Добавление линии фактических значений с улучшенным форматированием
     fig.add_trace(
-        go.Scatter(x=dates, y=actual, name="Фактический уровень радона", 
-                  line=dict(color='blue', width=2)),
+        go.Scatter(
+            x=dates, 
+            y=actual, 
+            name="Фактический уровень радона", 
+            line=dict(color='rgba(0, 0, 255, 0.8)', width=2.5),
+            mode='lines',
+            hovertemplate='%{x}<br>Факт: %{y:.2f} Бк/м³<extra></extra>'
+        ),
         secondary_y=False,
     )
     
-    # Добавление линии прогнозов
+    # Добавление линии прогнозов с улучшенным форматированием
     fig.add_trace(
-        go.Scatter(x=dates, y=predictions, name="Прогнозируемый уровень радона", 
-                  line=dict(color='red', width=2)),
+        go.Scatter(
+            x=dates, 
+            y=predictions, 
+            name="Прогнозируемый уровень радона", 
+            line=dict(color='rgba(255, 0, 0, 0.8)', width=2.5, dash='solid'),
+            mode='lines',
+            hovertemplate='%{x}<br>Прогноз: %{y:.2f} Бк/м³<extra></extra>'
+        ),
         secondary_y=False,
     )
     
@@ -201,22 +218,49 @@ def plot_predictions(data, predictions, future_predictions=None, prediction_boun
     if include_components:
         # Добавление температуры, если колонка существует
         if temp_col in data.columns:
-            fig.add_trace(
-                go.Scatter(x=dates, y=data[temp_col].iloc[-len(predictions):].values, 
-                          name=f"{temp_col}", line=dict(color='orange', dash='dot')),
-                secondary_y=True,
-            )
+            temp_values = data[temp_col].iloc[-len(predictions):].values
+            # Нормализация для лучшего отображения на втором y-axis
+            min_temp = min(temp_values)
+            max_temp = max(temp_values)
+            temp_range = max_temp - min_temp
+            if temp_range > 0:
+                # Добавляем в оптимизированном виде
+                fig.add_trace(
+                    go.Scatter(
+                        x=dates, 
+                        y=temp_values, 
+                        name=f"Температура", 
+                        line=dict(color='rgba(255, 165, 0, 0.7)', width=1.5, dash='dot'),
+                        mode='lines',
+                        hovertemplate='%{x}<br>Температура: %{y:.1f}°C<extra></extra>'
+                    ),
+                    secondary_y=True,
+                )
         
         # Добавление давления, если колонка существует
         if pressure_col in data.columns:
-            # Делим на 10 для лучшего масштабирования на графике
-            fig.add_trace(
-                go.Scatter(x=dates, y=data[pressure_col].iloc[-len(predictions):].values / 10, 
-                          name=f"{pressure_col} / 10", line=dict(color='green', dash='dot')),
-                secondary_y=True,
-            )
+            # Масштабирование для лучшего отображения
+            pressure_values = data[pressure_col].iloc[-len(predictions):].values
+            # Применяем нормализацию если нужно
+            min_pressure = min(pressure_values)
+            max_pressure = max(pressure_values)
+            pressure_range = max_pressure - min_pressure
+            
+            if pressure_range > 0:
+                scaled_pressure = pressure_values / 10
+                fig.add_trace(
+                    go.Scatter(
+                        x=dates, 
+                        y=scaled_pressure, 
+                        name=f"Давление (÷10)", 
+                        line=dict(color='rgba(0, 128, 0, 0.7)', width=1.5, dash='dot'),
+                        mode='lines',
+                        hovertemplate='%{x}<br>Давление: %{y:.1f} гПа<extra></extra>'
+                    ),
+                    secondary_y=True,
+                )
     
-    # Если есть прогнозы на будущее, добавляем их
+    # Если есть прогнозы на будущее, добавляем их в улучшенном формате
     if future_predictions is not None and len(future_predictions) > 0:
         # Создаем даты для будущих прогнозов
         last_date = dates[-1]
@@ -237,14 +281,20 @@ def plot_predictions(data, predictions, future_predictions=None, prediction_boun
             # Для неиндексированных данных
             future_dates = [last_date + i + 1 for i in range(len(future_predictions))]
         
-        # Добавляем будущие прогнозы на график
+        # Добавляем будущие прогнозы на график с улучшенным форматированием
         fig.add_trace(
-            go.Scatter(x=future_dates, y=future_predictions, name="Прогноз на будущее", 
-                      line=dict(color='purple', width=2.5, dash='dash')),
+            go.Scatter(
+                x=future_dates, 
+                y=future_predictions, 
+                name="Прогноз на будущее", 
+                line=dict(color='rgba(128, 0, 128, 0.9)', width=2.5, dash='dash'),
+                mode='lines',
+                hovertemplate='%{x}<br>Будущий прогноз: %{y:.2f} Бк/м³<extra></extra>'
+            ),
             secondary_y=False,
         )
         
-        # Если есть границы доверительного интервала, добавляем их
+        # Если есть границы доверительного интервала, добавляем их с улучшенным оформлением
         if prediction_bounds is not None:
             lower_bound, upper_bound = prediction_bounds
             
@@ -256,39 +306,106 @@ def plot_predictions(data, predictions, future_predictions=None, prediction_boun
                     fill='toself',
                     fillcolor='rgba(128, 0, 128, 0.2)',
                     line=dict(color='rgba(255, 255, 255, 0)'),
+                    name='95% доверительный интервал',
                     hoverinfo='skip',
-                    showlegend=True,
-                    name='95% доверительный интервал'
+                    showlegend=True
+                ),
+                secondary_y=False,
+            )
+            
+            # Добавление отдельных линий для верхней и нижней границы (для четкости)
+            fig.add_trace(
+                go.Scatter(
+                    x=future_dates,
+                    y=upper_bound,
+                    line=dict(color='rgba(128, 0, 128, 0.5)', width=1, dash='dot'),
+                    name="Верхняя граница",
+                    mode='lines',
+                    showlegend=False,
+                    hovertemplate='%{x}<br>Верхняя граница: %{y:.2f} Бк/м³<extra></extra>'
+                ),
+                secondary_y=False,
+            )
+            
+            fig.add_trace(
+                go.Scatter(
+                    x=future_dates,
+                    y=lower_bound,
+                    line=dict(color='rgba(128, 0, 128, 0.5)', width=1, dash='dot'),
+                    name="Нижняя граница",
+                    mode='lines',
+                    showlegend=False,
+                    hovertemplate='%{x}<br>Нижняя граница: %{y:.2f} Бк/м³<extra></extra>'
                 ),
                 secondary_y=False,
             )
     
-    # Обновление макета
+    # Обновление макета с улучшенным форматированием
     fig.update_layout(
         title=dict(
             text=plot_title,
-            font=dict(size=20)
+            font=dict(size=22, family="Arial", color="#333"),
+            x=0.5,
+            xanchor='center',
+            y=0.98,
+            yanchor='top',
         ),
-        xaxis_title="Дата и время",
+        xaxis=dict(
+            title="Дата и время",
+            title_font=dict(size=16, family="Arial", color="#333"),
+            tickfont=dict(size=12),
+            showgrid=True,
+            gridcolor='rgba(211, 211, 211, 0.5)',
+            zeroline=False,
+        ),
         legend=dict(
             orientation="h",
             yanchor="bottom",
             y=1.02,
             xanchor="center",
             x=0.5,
-            font=dict(size=12)
+            bgcolor='rgba(255, 255, 255, 0.8)',
+            bordercolor='rgba(211, 211, 211, 0.8)',
+            borderwidth=1,
+            font=dict(size=12, family="Arial", color="#333"),
+            itemsizing="constant"
         ),
         hovermode="x unified",
-        height=600,
+        height=650,
+        width=1000,
         template=template,
-        margin=dict(l=60, r=40, t=80, b=60)
+        margin=dict(l=80, r=80, t=100, b=80),
+        plot_bgcolor='rgba(255, 255, 255, 1)',
+        paper_bgcolor='rgba(255, 255, 255, 1)',
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=12,
+            font_family="Arial"
+        ),
     )
     
-    # Настройка осей Y
-    fig.update_yaxes(title_text="Уровень радона (Бк/м³)", secondary_y=False)
-    fig.update_yaxes(title_text="Значение", secondary_y=True)
+    # Настройка осей Y с улучшенным форматированием
+    fig.update_yaxes(
+        title_text="Уровень радона (Бк/м³)",
+        title_font=dict(size=16, family="Arial", color="#333"),
+        tickfont=dict(size=12),
+        showgrid=True,
+        gridcolor='rgba(211, 211, 211, 0.5)',
+        zeroline=True,
+        zerolinecolor='rgba(211, 211, 211, 0.8)',
+        zerolinewidth=1.5,
+        secondary_y=False
+    )
     
-    # Добавление ползунка и кнопок для выбора диапазона
+    fig.update_yaxes(
+        title_text="Значения параметров",
+        title_font=dict(size=16, family="Arial", color="#333"),
+        tickfont=dict(size=12),
+        showgrid=False,
+        secondary_y=True
+    )
+    
+    # Добавление ползунка и кнопок для выбора диапазона с улучшенным форматированием
     fig.update_layout(
         xaxis=dict(
             rangeselector=dict(
@@ -297,9 +414,16 @@ def plot_predictions(data, predictions, future_predictions=None, prediction_boun
                     dict(count=7, label="1 неделя", step="day", stepmode="backward"),
                     dict(count=1, label="1 месяц", step="month", stepmode="backward"),
                     dict(step="all", label="Весь период")
-                ])
+                ]),
+                font=dict(color="#333"),
+                bgcolor='rgba(222, 222, 222, 0.7)',
+                activecolor='rgba(33, 113, 181, 0.8)'
             ),
-            rangeslider=dict(visible=True),
+            rangeslider=dict(
+                visible=True,
+                bgcolor='rgba(222, 222, 222, 0.2)',
+                thickness=0.05
+            ),
             type="date"
         )
     )
@@ -530,7 +654,7 @@ def plot_feature_importance(model, data, seq_length=10):
     importance_pressure = []
     
     # Оригинальный прогноз
-    original_pred = model.predict(test_example)[0, 0]
+    original_pred = model.predict(test_example, verbose=0)[0, 0]
     
     # Оценка важности температуры
     for i in range(seq_length):
@@ -541,7 +665,7 @@ def plot_feature_importance(model, data, seq_length=10):
         modified_input[0, i, 0] = 0
         
         # Получаем прогноз и рассчитываем изменение
-        modified_pred = model.predict(modified_input)[0, 0]
+        modified_pred = model.predict(modified_input, verbose=0)[0, 0]
         importance_temp.append(abs(original_pred - modified_pred))
     
     # Оценка важности давления
@@ -553,7 +677,7 @@ def plot_feature_importance(model, data, seq_length=10):
         modified_input[0, i, 1] = 0
         
         # Получаем прогноз и рассчитываем изменение
-        modified_pred = model.predict(modified_input)[0, 0]
+        modified_pred = model.predict(modified_input, verbose=0)[0, 0]
         importance_pressure.append(abs(original_pred - modified_pred))
     
     # Создание меток для временных шагов
@@ -566,23 +690,208 @@ def plot_feature_importance(model, data, seq_length=10):
         'Важность': importance_temp + importance_pressure
     })
     
-    # Создание графика с помощью Plotly Express
-    fig = px.bar(importance_df, x='Временной шаг', y='Важность', color='Признак',
-                barmode='group', title='Влияние признаков на прогноз модели',
-                template='plotly_white')
+    # Создание улучшенного графика с помощью Plotly Express
+    fig = px.bar(
+        importance_df, 
+        x='Временной шаг', 
+        y='Важность', 
+        color='Признак',
+        barmode='group', 
+        title='Влияние признаков на прогноз модели',
+        template='plotly_white',
+        color_discrete_map={
+            temp_col: 'rgba(255, 165, 0, 0.8)', 
+            pressure_col: 'rgba(0, 128, 0, 0.8)'
+        },
+        height=600,
+        width=1000
+    )
     
+    # Улучшение форматирования
     fig.update_layout(
-        xaxis_title="Временной шаг",
-        yaxis_title="Изменение прогноза",
-        legend_title="Признак",
-        font=dict(size=12)
+        title=dict(
+            text='Влияние признаков на прогноз модели',
+            font=dict(size=22, family="Arial", color="#333"),
+            x=0.5,
+            xanchor='center'
+        ),
+        xaxis_title=dict(
+            text='Временной шаг',
+            font=dict(size=16, family="Arial", color="#333")
+        ),
+        yaxis_title=dict(
+            text='Изменение прогноза при обнулении признака',
+            font=dict(size=16, family="Arial", color="#333")
+        ),
+        legend=dict(
+            title=dict(
+                text='Признак',
+                font=dict(size=14, family="Arial", color="#333")
+            ),
+            font=dict(size=12, family="Arial", color="#333"),
+            bgcolor='rgba(255, 255, 255, 0.8)',
+            bordercolor='rgba(211, 211, 211, 0.8)',
+            borderwidth=1
+        ),
+        plot_bgcolor='rgba(255, 255, 255, 1)',
+        paper_bgcolor='rgba(255, 255, 255, 1)',
+        margin=dict(l=80, r=40, t=100, b=80),
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=12,
+            font_family="Arial"
+        )
+    )
+    
+    # Улучшение шрифтов осей
+    fig.update_xaxes(
+        tickfont=dict(size=12, family="Arial", color="#333"),
+        gridcolor='rgba(211, 211, 211, 0.5)'
+    )
+    
+    fig.update_yaxes(
+        tickfont=dict(size=12, family="Arial", color="#333"),
+        gridcolor='rgba(211, 211, 211, 0.5)'
+    )
+    
+    # Улучшение подсказок
+    fig.update_traces(
+        hovertemplate='Временной шаг: %{x}<br>Изменение прогноза: %{y:.4f}<extra></extra>'
     )
     
     return fig
 
 
-def predict_radon_levels(model_path, data, use_monte_carlo=True, plot_theme='plotly_white'):
-    """Загрузка модели и создание прогнозов с визуализацией."""
+def save_plots_to_html(plots, filename='radon_analysis_report.html', title='Отчет по анализу и прогнозированию уровня радона'):
+    """
+    Сохраняет несколько графиков Plotly в один HTML-файл.
+    
+    Args:
+        plots: Словарь или список с графиками Plotly.
+               Если словарь, ключи используются как заголовки разделов
+        filename: Имя HTML-файла для сохранения
+        title: Заголовок отчета
+    
+    Returns:
+        path: Путь к сохраненному HTML-файлу
+    """
+    import plotly.io as pio
+    import os
+    import datetime
+    
+    # Создание HTML с заголовком и CSS
+    html_string = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>{title}</title>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f8f9fa;
+                color: #333;
+            }}
+            h1 {{
+                color: #2c3e50;
+                text-align: center;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #eee;
+                margin-bottom: 30px;
+            }}
+            h2 {{
+                color: #34495e;
+                margin-top: 40px;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+            }}
+            .plot-container {{
+                background-color: white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                padding: 15px;
+                margin-bottom: 30px;
+                border-radius: 5px;
+            }}
+            .footer {{
+                text-align: center;
+                margin-top: 50px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+                font-size: 0.9em;
+                color: #7f8c8d;
+            }}
+        </style>
+    </head>
+    <body>
+        <h1>{title}</h1>
+    """
+    
+    # Генерация даты отчета
+    now = datetime.datetime.now()
+    date_str = now.strftime("%d.%m.%Y %H:%M")
+    html_string += f'<p style="text-align: center;">Дата создания: {date_str}</p>\n'
+    
+    # Добавление графиков
+    if isinstance(plots, dict):
+        for section_title, fig in plots.items():
+            html_string += f'<h2>{section_title}</h2>\n'
+            html_string += '<div class="plot-container">\n'
+            html_string += pio.to_html(fig, full_html=False)
+            html_string += '</div>\n'
+    else:
+        for i, fig in enumerate(plots):
+            html_string += f'<h2>График {i+1}</h2>\n'
+            html_string += '<div class="plot-container">\n'
+            html_string += pio.to_html(fig, full_html=False)
+            html_string += '</div>\n'
+    
+    # Добавление футера
+    html_string += f"""
+        <div class="footer">
+            <p>Автоматически сгенерированный отчет. Модель прогнозирования уровня радона.</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Сохранение HTML файла
+    save_dir = os.path.dirname(filename)
+    if save_dir and not os.path.exists(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
+    
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(html_string)
+    
+    print(f"Отчет успешно сохранен в {os.path.abspath(filename)}")
+    return os.path.abspath(filename)
+
+
+def predict_radon_levels(model_path, data, use_monte_carlo=True, plot_theme='plotly_white', 
+                     save_html=False, html_filename='radon_prediction_report.html'):
+    """
+    Загрузка модели и создание прогнозов с визуализацией.
+    
+    Args:
+        model_path: Путь к сохраненной модели
+        data: DataFrame с данными
+        use_monte_carlo: Использовать ли метод Монте-Карло для оценки неопределенности
+        plot_theme: Тема оформления графиков
+        save_html: Сохранить ли результаты в HTML-файл
+        html_filename: Имя HTML-файла для сохранения отчета
+        
+    Returns:
+        predictions: Массив прогнозов для существующих данных
+        future_predictions: Массив прогнозов на будущее
+        prediction_bounds: Границы доверительного интервала (если use_monte_carlo=True)
+        fig: Объект графика с прогнозами
+        fig_importance: Объект графика с важностью признаков
+        html_path: Путь к сохраненному HTML-файлу (если save_html=True)
+    """
     try:
         # Пытаемся загрузить модель из указанного пути
         try:
@@ -672,7 +981,126 @@ def predict_radon_levels(model_path, data, use_monte_carlo=True, plot_theme='plo
         # Создание графика важности признаков
         fig_importance = plot_feature_importance(model, data, seq_length=10)
         
-        return predictions, future_predictions, prediction_bounds, fig, fig_importance
+        # Если требуется, сохраняем графики в HTML-файл
+        html_path = None
+        if save_html:
+            # Создаем дополнительные графики для отчета
+            # Распределение признаков
+            fig_dist = px.histogram(
+                data,
+                x=radon_col,
+                title=f"Распределение значений {radon_col}",
+                template=plot_theme,
+                marginal="box",
+                opacity=0.8,
+                barmode="overlay",
+                color_discrete_sequence=['rgba(0, 0, 255, 0.7)']
+            )
+            fig_dist.update_layout(
+                height=500,
+                width=1000,
+                title_font=dict(size=22, family="Arial", color="#333"),
+                xaxis_title=dict(text=radon_col, font=dict(size=16, family="Arial")),
+                yaxis_title=dict(text="Частота", font=dict(size=16, family="Arial")),
+                plot_bgcolor='rgba(255, 255, 255, 1)',
+                paper_bgcolor='rgba(255, 255, 255, 1)',
+                margin=dict(l=80, r=40, t=100, b=80)
+            )
+            
+            # Корреляция между признаками
+            if temp_col is not None and pressure_col is not None:
+                correlation = data[[radon_col, temp_col, pressure_col]].corr()
+                import plotly.figure_factory as ff
+                fig_corr = ff.create_annotated_heatmap(
+                    z=correlation.values,
+                    x=correlation.columns.tolist(),
+                    y=correlation.index.tolist(),
+                    annotation_text=correlation.round(2).values.tolist(),
+                    colorscale='Viridis',
+                    showscale=True
+                )
+                fig_corr.update_layout(
+                    title_text="Корреляция между признаками",
+                    title_font=dict(size=22, family="Arial", color="#333"),
+                    height=600,
+                    width=1000,
+                    plot_bgcolor='rgba(255, 255, 255, 1)',
+                    paper_bgcolor='rgba(255, 255, 255, 1)',
+                    margin=dict(l=80, r=40, t=100, b=80)
+                )
+                
+                # Также создаем график временных рядов
+                fig_time = px.line(
+                    data,
+                    y=[radon_col, temp_col, pressure_col],
+                    title="Временные ряды признаков",
+                    template=plot_theme
+                )
+                fig_time.update_layout(
+                    height=600,
+                    width=1000,
+                    title_font=dict(size=22, family="Arial", color="#333"),
+                    xaxis_title=dict(text="Время", font=dict(size=16, family="Arial")),
+                    yaxis_title=dict(text="Значение", font=dict(size=16, family="Arial")),
+                    plot_bgcolor='rgba(255, 255, 255, 1)',
+                    paper_bgcolor='rgba(255, 255, 255, 1)',
+                    margin=dict(l=80, r=40, t=100, b=80),
+                    legend=dict(
+                        title="Признак",
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.02,
+                        xanchor="center",
+                        x=0.5
+                    )
+                )
+                
+                # Собираем все графики в словарь для отчета
+                plots_dict = {
+                    "Временные ряды признаков": fig_time,
+                    "Прогнозирование уровня радона": fig,
+                    "Влияние признаков на прогноз": fig_importance,
+                    "Распределение значений радона": fig_dist,
+                    "Корреляция между признаками": fig_corr
+                }
+            else:
+                # Если не нашли нужные колонки, добавляем только имеющиеся графики
+                plots_dict = {
+                    "Прогнозирование уровня радона": fig,
+                    "Влияние признаков на прогноз": fig_importance,
+                    "Распределение значений радона": fig_dist
+                }
+            
+            # Сохраняем отчет с графиками в HTML
+            model_name = os.path.basename(model_path).replace(".h5", "")
+            title = f"Отчет по прогнозированию уровня радона (модель: {model_name})"
+            
+            # Создаем директорию для отчета внутри Google Drive, если доступно
+            try:
+                from google.colab import drive
+                is_mounted = os.path.exists('/content/drive/MyDrive')
+                if is_mounted:
+                    save_dir = "/content/drive/MyDrive/radon_reports"
+                    os.makedirs(save_dir, exist_ok=True)
+                    html_filename = os.path.join(save_dir, html_filename)
+            except ImportError:
+                pass
+                
+            html_path = save_plots_to_html(plots_dict, filename=html_filename, title=title)
+            print(f"Отчет с графиками сохранен в {html_path}")
+            
+            # Для Google Colab добавляем ссылку для скачивания
+            try:
+                from google.colab import files
+                files.download(html_path)
+                print("Ссылка для скачивания файла создана.")
+            except (ImportError, Exception) as e:
+                print(f"Файл сохранен локально. {str(e)}")
+        
+        if save_html:
+            return predictions, future_predictions, prediction_bounds, fig, fig_importance, html_path
+        else:
+            return predictions, future_predictions, prediction_bounds, fig, fig_importance
         
     except Exception as e:
         print(f"Ошибка при прогнозировании: {str(e)}")
