@@ -19,7 +19,8 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from tensorflow.keras import regularizers
 from tensorflow.keras.models import Model
-from tensorflow.keras.losses import mean_squared_error
+# Используем другой подход для импорта MSE
+import tensorflow.keras.losses as klosses
 import tensorflow.keras.backend as K
 
 
@@ -56,7 +57,6 @@ def prepare_data(data, seq_length=10, test_size=0.2, random_state=42, scaler_typ
 
 def create_model(input_shape, model_type='lstm', l2_reg=0.001):
     """Создание модели указанной архитектуры."""
-    from tensorflow.keras.losses import mean_squared_error
     
     if model_type == 'lstm':
         model = Sequential()
@@ -151,7 +151,8 @@ def create_model(input_shape, model_type='lstm', l2_reg=0.001):
         # Создание модели
         model = Model(inputs=input_layer, outputs=output)
         
-    model.compile(optimizer=Adam(learning_rate=0.001), loss=mean_squared_error)
+    # Компиляция модели с использованием MSE в правильном формате
+    model.compile(optimizer=Adam(learning_rate=0.001), loss='mse')
     model.summary()
     return model
 
@@ -241,8 +242,6 @@ def save_model_and_history(model, history, model_type, save_dir=None):
         model_path: Путь к сохраненной модели
         history_path: Путь к сохраненной истории обучения
     """
-    from tensorflow.keras.losses import mean_squared_error
-    import tensorflow.keras.backend as K
     import os
     
     # Создание метки даты и времени
@@ -279,7 +278,7 @@ def save_model_and_history(model, history, model_type, save_dir=None):
     # Сохранение модели в формате h5
     model_path = os.path.join(save_dir, f"{model_filename}.h5")
     
-    # Сохраняем модель с указанием custom_objects для корректной загрузки
+    # Сохраняем модель с указанием формата
     save_model(model, model_path, save_format='h5')
     print(f"Модель сохранена в {model_path}")
     
