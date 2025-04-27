@@ -1,0 +1,481 @@
+# Оценка моделей в Google Colab
+# Этот блокнот демонстрирует, как использовать инструменты metric_standart для оценки нейронных сетей
+
+# Ячейка 1: Установка необходимых пакетов
+!pip install tensorflow keras scikit-learn numpy pandas matplotlib seaborn chardet
+
+# Ячейка 2: Клонирование репозитория или загрузка файлов
+# Вариант 1: Клонирование репозитория (раскомментируйте при необходимости)
+# !git clone https://your-repo-url.git
+# %cd your-repo-name
+
+# Вариант 2: Загрузка файлов проекта
+# Запустите эту ячейку и используйте диалог загрузки файлов
+from google.colab import files as colab_files
+import os
+import shutil
+import zipfile
+
+# Создание директорий для загрузки
+!mkdir -p uploaded_files
+!mkdir -p metric_standart
+!mkdir -p model_save_preset/models
+!mkdir -p data
+
+# Загрузка файлов проекта
+print("Пожалуйста, загрузите ZIP-архив проекта, содержащий модели и данные")
+uploaded = colab_files.upload()
+
+# Распаковка загруженного ZIP-архива
+for filename in uploaded.keys():
+    if filename.endswith('.zip'):
+        with zipfile.ZipFile(filename, 'r') as zip_ref:
+            zip_ref.extractall('uploaded_files')
+        print(f"Извлечено {filename} в директорию uploaded_files/")
+
+# Ячейка 3: Копирование необходимых файлов в соответствующие директории
+# Копирование Python-файлов metric_standart
+!cp uploaded_files/metric_standart/*.py metric_standart/
+!mkdir -p metric_standart/plots
+
+# Копирование моделей
+!cp -r uploaded_files/model_save_preset/models/* model_save_preset/models/
+
+# Копирование данных
+!cp uploaded_files/data/data.csv data/
+
+# Ячейка 4: Проверка структуры директорий
+!ls -la metric_standart
+!ls -la model_save_preset/models
+!ls -la data
+
+# Ячейка 5: Исправление путей импорта в модуле metric_standart
+%%writefile metric_standart/__init__.py
+"""
+Инструменты для оценки моделей
+
+Этот пакет предоставляет утилиты для оценки моделей нейронных сетей
+с дополнительными метриками и визуализацией их производительности.
+"""
+
+from metric_standart.model_evaluator import (
+    load_and_prepare_data,
+    load_models_from_directory,
+    evaluate_models,
+    save_evaluation_results,
+    plot_prediction_comparison,
+    save_metrics_to_pkl
+)
+
+__all__ = [
+    'load_and_prepare_data',
+    'load_models_from_directory',
+    'evaluate_models',
+    'save_evaluation_results',
+    'plot_prediction_comparison',
+    'save_metrics_to_pkl'
+]
+
+# Ячейка 6: Импорт модулей оценки
+import sys
+sys.path.append('.')
+
+from metric_standart.model_evaluator import (
+    load_and_prepare_data,
+    load_models_from_directory,
+    evaluate_models,
+    save_evaluation_results,
+    plot_prediction_comparison,
+    save_metrics_to_pkl
+)
+
+# Ячейка 7: Загрузка и подготовка данных
+data_path = 'data/data.csv'
+print(f"Загрузка и подготовка данных из {data_path}...")
+
+try:
+    data = load_and_prepare_data(data_path, time_step=5)
+    print("Данные успешно загружены!")
+except Exception as e:
+    print(f"Ошибка загрузки данных: {e}")
+
+# Ячейка 8: Загрузка моделей
+models_dir = 'model_save_preset/models'
+print(f"Загрузка моделей из {models_dir}...")
+
+models = load_models_from_directory(models_dir)
+
+# Подсчет загруженных моделей
+model_count = sum(len(group_models) for group_models in models.values())
+print(f"Загружено {model_count} моделей из {len(models)} групп")
+
+# Ячейка 8.5: Проверка моделей на наличие проблем
+print("Проверка загруженных моделей на наличие проблем...")
+
+if not models or sum(len(group_models) for group_models in models.values()) == 0:
+    print("Предупреждение: Не удалось загрузить ни одной модели. Возможные причины:")
+    print("1. Неверная структура каталогов")
+    print("2. Отсутствие файлов моделей (.h5)")
+    print("3. Несовместимость версий TensorFlow/Keras")
+    
+    # Проверка структуры каталогов
+    !find model_save_preset -type d | sort
+    
+    # Проверка наличия файлов моделей
+    !find model_save_preset -name "*.h5" | wc -l
+    
+    print("\nИнформация о версиях библиотек:")
+    !python -c "import tensorflow as tf; print(f'TensorFlow version: {tf.__version__}')"
+    !python -c "import keras; print(f'Keras version: {keras.__version__}')"
+    
+    print("\nПытаемся загрузить модели напрямую...")
+    
+    import tensorflow as tf
+    
+    # Обновляем custom_objects для поддержки дополнительных слоев и функций потерь
+    custom_objects = {
+        'mse': tf.keras.losses.MeanSquaredError(),
+        'mae': tf.keras.losses.MeanAbsoluteError(),
+        'mean_squared_error': tf.keras.losses.MeanSquaredError(),
+        'mean_absolute_error': tf.keras.losses.MeanAbsoluteError(),
+        'mape': tf.keras.losses.MeanAbsolutePercentageError(),
+        'mean_absolute_percentage_error': tf.keras.losses.MeanAbsolutePercentageError()
+    }
+    
+    # Попытка загрузить модели напрямую
+    import glob
+    model_files = glob.glob('model_save_preset/models/**/*.h5', recursive=True)
+    
+    if model_files:
+        print(f"Найдено {len(model_files)} файлов моделей. Пробуем загрузить первую модель напрямую...")
+        try:
+            model = tf.keras.models.load_model(model_files[0], custom_objects=custom_objects)
+            print(f"Модель {model_files[0]} успешно загружена напрямую! Структура модели:")
+            model.summary()
+        except Exception as e:
+            print(f"Ошибка при загрузке модели напрямую: {e}")
+            print("Рекомендации:")
+            print("1. Обновите TensorFlow до версии, совместимой с вашими моделями")
+            print("2. Если модели были сохранены с кастомными слоями или функциями потерь, добавьте их в custom_objects")
+    else:
+        print("Не найдено ни одного файла модели (.h5) в каталоге model_save_preset/models/")
+else:
+    print(f"Загружено {sum(len(group_models) for group_models in models.values())} моделей из {len(models)} групп. Все в порядке!")
+
+# Ячейка 9: Оценка моделей
+print("Оценка моделей с дополнительными метриками...")
+results = evaluate_models(models, data)
+
+# Ячейка 10: Сохранение результатов в CSV
+output_file = 'metric_standart/extended_model_metrics.csv'
+save_evaluation_results(results, output_file)
+print(f"Результаты оценки сохранены в {output_file}")
+
+# Ячейка 10.5: Сохранение метрик в .pkl файлы
+print("Сохранение метрик в .pkl файлах вместо генерации графиков...")
+
+# Создаем директорию для истории метрик
+history_dir = 'model_save_preset/history'
+!mkdir -p "{history_dir}"
+
+# Удаляем существующие .pkl файлы перед созданием новых
+!find "{history_dir}" -name "*.pkl" -delete
+print("Существующие .pkl файлы удалены")
+
+# Сохраняем метрики напрямую без использования функции plot_prediction_comparison
+import pickle
+
+# Создаем структуру директорий для всех групп моделей
+model_groups = sorted(list(models.keys()))
+print(f"Создание директорий для {len(model_groups)} групп моделей...")
+
+# Формируем единый набор метрик для всех моделей
+all_metrics = [
+    'mae', 'mse', 'rmse', 'mape', 'r2_score', 
+    'explained_variance', 'max_error', 'median_absolute_error',
+    'norm_mae', 'norm_rmse'
+]
+
+# Убедимся, что в результатах каждой модели есть все метрики
+for group_name, group_models in results.items():
+    for model_name, metrics in group_models.items():
+        # Если нет метрик или словарь пустой, инициализируем его
+        if not metrics:
+            results[group_name][model_name] = {}
+        
+        # Добавим отсутствующие метрики со значением None
+        for metric in all_metrics:
+            if metric not in results[group_name][model_name]:
+                results[group_name][model_name][metric] = None
+
+# Счетчики статистики
+saved_files = 0
+failed_files = 0
+
+# Перебираем все группы и модели
+for group_name in model_groups:
+    # Создаем директорию группы
+    group_dir = os.path.join(history_dir, group_name)
+    !mkdir -p "{group_dir}"
+    print(f"Обработка группы: {group_name}")
+    
+    # Проверяем, есть ли результаты для этой группы
+    if group_name not in results:
+        print(f"  Нет результатов для группы {group_name}")
+        continue
+    
+    # Перебираем все модели в группе
+    for model_name, model_metrics in results[group_name].items():
+        # Создаем объект history
+        history_obj = {
+            'history': model_metrics,
+            'params': {},
+            'epoch': [],
+            'model_name': model_name,
+            'group_name': group_name,
+            'metrics': all_metrics  # Добавляем список всех метрик для документации
+        }
+        
+        # Формируем путь к файлу
+        pkl_path = os.path.join(group_dir, f"{model_name}.pkl")
+        
+        # Сохраняем файл
+        try:
+            with open(pkl_path, 'wb') as f:
+                pickle.dump(history_obj, f)
+            print(f"  ✓ Сохранен: {pkl_path}")
+            saved_files += 1
+        except Exception as e:
+            print(f"  ✗ Ошибка: {pkl_path} - {str(e)}")
+            failed_files += 1
+            
+            # Попробуем сохранить с безопасным именем
+            try:
+                # Создаем директорию без пробелов
+                safe_group_name = group_name.replace(" ", "_")
+                safe_group_dir = os.path.join(history_dir, safe_group_name)
+                !mkdir -p "{safe_group_dir}"
+                
+                # Формируем безопасный путь
+                safe_pkl_path = os.path.join(safe_group_dir, f"{model_name}.pkl")
+                
+                # Пробуем сохранить
+                with open(safe_pkl_path, 'wb') as f:
+                    pickle.dump(history_obj, f)
+                print(f"  ✓ Сохранен альтернативно: {safe_pkl_path}")
+                saved_files += 1
+            except Exception as e2:
+                print(f"  ✗ Полная ошибка: {str(e2)}")
+
+# Выводим итоговую статистику
+print(f"\nСохранено {saved_files} .pkl файлов, ошибок: {failed_files}")
+
+# Проверка результатов сохранения
+print("\nСписок всех сохраненных .pkl файлов:")
+!find "{history_dir}" -name "*.pkl" | sort
+
+total_found = !find "{history_dir}" -name "*.pkl" | wc -l
+total_expected = sum(len(results.get(group, {})) for group in model_groups)
+print(f"Найдено {total_found[0]} .pkl файлов из {total_expected} ожидаемых")
+
+# Дополнительная проверка - вывод содержимого случайного .pkl файла для подтверждения корректности
+pkl_files = !find "{history_dir}" -name "*.pkl"
+if pkl_files:
+    sample_file = pkl_files[0]
+    print(f"\nПроверка содержимого файла {sample_file}:")
+    try:
+        with open(sample_file, 'rb') as f:
+            sample_data = pickle.load(f)
+        print(f"Группа: {sample_data.get('group_name')}")
+        print(f"Модель: {sample_data.get('model_name')}")
+        metrics = sample_data.get('history', {})
+        print(f"Метрики: {list(metrics.keys())}")
+    except Exception as e:
+        print(f"Ошибка чтения файла: {str(e)}")
+
+# Ячейка 11: Генерация графиков прогнозов для каждой модели
+# УДАЛЕНО: Эта ячейка больше не создает графики, только сохраняет метрики в .pkl файлы
+
+# Ячейка 12: Анализ - Импорт модуля анализа
+from metric_standart.analyze_results import (
+    load_metrics,
+    create_comparison_table,
+    plot_metric_comparison,
+    plot_metrics_radar,
+    plot_group_performance,
+    save_summary_report
+)
+
+# Ячейка 13: Загрузка и анализ результатов
+try:
+    df = load_metrics(output_file)
+    print(f"Загружены метрики для {len(df)} моделей")
+    
+    # Проверка, что датафрейм содержит данные
+    if len(df) == 0:
+        print("Предупреждение: В файле метрик нет данных. Проверьте результаты оценки моделей.")
+    else:
+        # Создание таблицы сравнения
+        comparison = create_comparison_table(df)
+        print("\nТаблица сравнения моделей:")
+        display(comparison)
+except Exception as e:
+    print(f"Ошибка при обработке файла метрик: {e}")
+    print("Проверьте, что файл метрик был правильно создан и содержит необходимые данные.")
+    
+    # Создадим пустой датафрейм для дальнейшего использования, чтобы избежать ошибок
+    import pandas as pd
+    df = pd.DataFrame(columns=['Group', 'Model'])
+
+# Ячейка 14: Создание графиков сравнения метрик
+try:
+    if len(df) > 0:
+        metrics_to_plot = [col for col in df.columns if col not in ['Group', 'Model']]
+        if metrics_to_plot:
+            plot_metric_comparison(df, metrics_to_plot, plots_dir)
+        else:
+            print("Нет доступных метрик для создания графиков сравнения")
+    else:
+        print("Нет данных для создания графиков сравнения метрик")
+except Exception as e:
+    print(f"Ошибка при создании графиков сравнения метрик: {e}")
+
+# Ячейка 15: Создание радарной диаграммы, сравнивающей лучшие модели
+try:
+    if len(df) > 0 and len([col for col in df.columns if col not in ['Group', 'Model']]) > 0:
+        plot_metrics_radar(df, plots_dir)
+    else:
+        print("Недостаточно данных для создания радарной диаграммы")
+except Exception as e:
+    print(f"Ошибка при создании радарной диаграммы: {e}")
+
+# Ячейка 16: Создание графиков производительности по группам
+try:
+    if len(df) > 0:
+        for metric in ['rmse', 'mae', 'r2_score']:
+            if metric in df.columns:
+                plot_group_performance(df, metric, plots_dir)
+        
+        # Если ни одна из стандартных метрик не найдена, попробуем использовать любую доступную
+        metrics_found = any(metric in df.columns for metric in ['rmse', 'mae', 'r2_score'])
+        if not metrics_found:
+            available_metrics = [col for col in df.columns if col not in ['Group', 'Model']]
+            if available_metrics:
+                print(f"Стандартные метрики не найдены, использую доступную метрику: {available_metrics[0]}")
+                plot_group_performance(df, available_metrics[0], plots_dir)
+            else:
+                print("Нет доступных метрик для создания графиков по группам")
+    else:
+        print("Нет данных для создания графиков производительности по группам")
+except Exception as e:
+    print(f"Ошибка при создании графиков производительности по группам: {e}")
+
+# Ячейка 17: Создание отчета с результатами
+try:
+    if len(df) > 0 and len([col for col in df.columns if col not in ['Group', 'Model']]) > 0:
+        summary_file = 'metric_standart/model_summary.txt'
+        save_summary_report(df, summary_file)
+        
+        # Вывод отчета с результатами
+        print("\nСводка оценки моделей:")
+        with open(summary_file, 'r') as f:
+            summary_text = f.read()
+        print(summary_text)
+    else:
+        print("Недостаточно данных для создания отчета с результатами")
+except Exception as e:
+    print(f"Ошибка при создании отчета с результатами: {e}")
+
+# Ячейка 18: Скачивание результатов
+# Запустите эту ячейку для скачивания результатов оценки
+from google.colab import files as colab_files
+import os
+import glob
+import shutil
+
+# Временная директория для копирования файлов без пробелов в путях
+temp_dir = 'temp_for_zip'
+!mkdir -p {temp_dir}
+
+# Функция для копирования файлов во временную директорию с переименованием
+def prepare_files_for_zip(source_paths, temp_dir):
+    copied_files = []
+    for i, path in enumerate(source_paths):
+        # Создаем понятное имя файла без пробелов в пути
+        basename = os.path.basename(path)
+        dirname = os.path.dirname(path).replace('/', '_').replace(' ', '_')
+        new_name = f"{dirname}_{basename}"
+        dest_path = os.path.join(temp_dir, new_name)
+        
+        # Копируем файл во временную директорию
+        try:
+            shutil.copy2(path, dest_path)
+            copied_files.append(dest_path)
+        except Exception as e:
+            print(f"Ошибка при копировании {path}: {e}")
+    
+    return copied_files
+
+# Проверка наличия результатов
+files_to_copy = []
+
+# Метрики и отчеты
+if os.path.exists('metric_standart/extended_model_metrics.csv'):
+    files_to_copy.append('metric_standart/extended_model_metrics.csv')
+
+if os.path.exists('metric_standart/model_summary.txt'):
+    files_to_copy.append('metric_standart/model_summary.txt')
+
+# .pkl файлы с метриками
+# Поиск обычных .pkl файлов
+pkl_files = glob.glob('model_save_preset/history/**/*.pkl', recursive=True)
+print(f"Найдено {len(pkl_files)} обычных .pkl файлов с метриками")
+
+# Также проверяем альтернативные безопасные директории (с заменой пробелов на подчеркивания)
+safe_model_groups = []
+for group in models.keys():
+    safe_group = group.replace(" ", "_")
+    if safe_group != group:
+        safe_model_groups.append(safe_group)
+
+# Ищем дополнительные .pkl файлы в безопасных директориях
+alt_pkl_files = []
+for safe_group in safe_model_groups:
+    safe_dir = os.path.join('model_save_preset/history', safe_group)
+    if os.path.exists(safe_dir):
+        alt_files = glob.glob(f'{safe_dir}/*.pkl')
+        alt_pkl_files.extend(alt_files)
+
+print(f"Дополнительно найдено {len(alt_pkl_files)} .pkl файлов в безопасных директориях")
+
+# Объединяем все файлы
+all_pkl_files = pkl_files + alt_pkl_files
+print(f"Всего найдено {len(all_pkl_files)} .pkl файлов")
+
+for pkl in all_pkl_files[:5]:  # Показываем первые 5 файлов для примера
+    print(f"  - {pkl}")
+if len(all_pkl_files) > 5:
+    print(f"  - ... и еще {len(all_pkl_files) - 5} файлов")
+
+files_to_copy.extend(all_pkl_files)
+
+# Копируем файлы во временную директорию
+if files_to_copy:
+    print(f"Подготовка {len(files_to_copy)} файлов для архивации...")
+    copied_files = prepare_files_for_zip(files_to_copy, temp_dir)
+    
+    # Создание архива
+    if copied_files:
+        # Переходим во временную директорию для создания архива
+        !cd {temp_dir} && zip -r ../model_evaluation_results.zip *
+        
+        # Скачивание архива
+        colab_files.download('model_evaluation_results.zip')
+        print("Начата загрузка файла model_evaluation_results.zip")
+        
+        # Удаляем временную директорию
+        !rm -rf {temp_dir}
+    else:
+        print("Ошибка при подготовке файлов для архивации")
+else:
+    print("Нет результатов для скачивания. Проверьте, были ли успешно созданы файлы метрик.") 

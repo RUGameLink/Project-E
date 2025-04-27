@@ -69,6 +69,48 @@ BASE_PATH = Path("../model_save_preset")
 MODELS_PATH = BASE_PATH / "models"
 HISTORY_PATH = BASE_PATH / "history"
 
+# Define standard metrics used in the updated history format
+STANDARD_METRICS = [
+    'rmse',
+    'norm_rmse',
+    'r2_score',
+    'explained_variance',
+    'mae',
+    'mape',
+    'max_error',
+    'median_absolute_error',
+    'mse',
+    'norm_mae'
+]
+
+# Define metrics where higher values are better
+HIGHER_IS_BETTER = {
+    'r2_score': True,
+    'explained_variance': True,
+    'rmse': False,
+    'mse': False,
+    'mae': False,
+    'mape': False,
+    'max_error': False,
+    'median_absolute_error': False,
+    'norm_rmse': False,
+    'norm_mae': False
+}
+
+# Friendly display names for metrics
+METRIC_DISPLAY_NAMES = {
+    'rmse': 'Root Mean Squared Error (RMSE)',
+    'norm_rmse': 'Normalized RMSE',
+    'r2_score': 'R² Score',
+    'explained_variance': 'Explained Variance',
+    'mae': 'Mean Absolute Error (MAE)',
+    'mape': 'Mean Absolute Percentage Error (MAPE)',
+    'max_error': 'Maximum Error',
+    'median_absolute_error': 'Median Absolute Error',
+    'mse': 'Mean Squared Error (MSE)',
+    'norm_mae': 'Normalized MAE'
+}
+
 def main():
     # Add custom CSS
     st.markdown("""
@@ -104,6 +146,22 @@ def main():
         st.error("No model histories found in the specified directory.")
         return
     
+    # Display warning about incompatible pickle files
+    st.warning("""
+    **Note:** Due to NumPy version incompatibility, we are unable to load history files from groups '1 old' and '2 new'.
+    Only models from groups '3 alt_model' and '4 alt_new_model' will be displayed.
+    """)
+    
+    # Filter out groups 1 and 2 as they are incompatible
+    compatible_histories = {
+        group: models 
+        for group, models in all_histories.items() 
+        if group not in ['1 old', '2 new'] or (len(models) > 0 and not all(
+            isinstance(history, dict) and history.get('__placeholder__', False) 
+            for history in models.values()
+        ))
+    }
+    
     # Sidebar
     st.sidebar.title("Navigation")
     
@@ -118,20 +176,20 @@ def main():
     selected_page = st.sidebar.radio("Go to", pages)
     
     # Create metrics comparison dataframe
-    comparison_df = create_metrics_comparison(all_histories)
+    comparison_df = create_metrics_comparison(compatible_histories, metrics=STANDARD_METRICS)
     
     # Display selected page
     if selected_page == "Model Overview":
-        display_model_overview(all_histories, comparison_df)
+        display_model_overview(compatible_histories, comparison_df)
     
     elif selected_page == "Training History":
-        display_training_history(all_histories)
+        display_training_history(compatible_histories)
     
     elif selected_page == "Model Comparison":
-        display_model_comparison(all_histories, comparison_df)
+        display_model_comparison(compatible_histories, comparison_df)
     
     elif selected_page == "Best Models":
-        display_best_models(all_histories)
+        display_best_models(compatible_histories)
 
 def display_model_overview(all_histories, comparison_df):
     """Display overview of all models."""
@@ -248,387 +306,523 @@ def display_model_architecture(all_histories):
         # Different model naming patterns for different groups
         group_path = MODELS_PATH / selected_group
         
+        try:
         if os.path.exists(group_path):
+                # Get all model files in the group directory
             model_files = [f for f in os.listdir(group_path) if f.endswith('.h5')]
             
-            # 1. Для групп 1 и 2: model_name.h5 (например, lstm.h5)
-            exact_match = f"{selected_model}.h5"
-            if exact_match in model_files:
-                model_path = group_path / exact_match
+                # First attempt: Direct match with model name
+                if f"{selected_model}.h5" in model_files:
+                    model_path = group_path / f"{selected_model}.h5"
                 model_found = True
-            
-            # 2. Для групп 3 и 4: model_<model_type>_<timestamp>.h5 (например, model_lstm_20250407_0741.h5)
-            if not model_found:
-                for model_file in model_files:
-                    if model_file.startswith('model_') and selected_model in model_file:
-                        model_path = group_path / model_file
+                elif f"model_{selected_model}.h5" in model_files:
+                    model_path = group_path / f"model_{selected_model}.h5"
                         model_found = True
-                        break
-            
-            # 3. Для групп 3 и 4 с best в имени: model_<model_type>_best_<timestamp>.h5
-            if not model_found:
-                for model_file in model_files:
-                    if model_file.startswith('model_') and 'best' in model_file and selected_model in model_file:
-                        model_path = group_path / model_file
-                        model_found = True
-                        break
-        
-        if model_found and model_path:
-            # Visualize model
-            with st.spinner(f"Loading model architecture for {selected_model}..."):
-                model, architecture_fig, summary_fig = visualize_keras_model(str(model_path))
-                
-                if model:
-                    # Display visualizations
-                    if architecture_fig:
-                        st.plotly_chart(architecture_fig, use_container_width=True)
-                    else:
-                        st.warning("Could not generate architecture visualization for this model.")
-                    
-                    if summary_fig:
-                        st.plotly_chart(summary_fig, use_container_width=True)
-                    else:
-                        # If we couldn't create a summary figure, try to display a text summary
-                        st.subheader("Model Summary")
-                        summary_list = []
-                        try:
-                            model.summary(print_fn=lambda x: summary_list.append(x))
-                            st.text('\n'.join(summary_list))
-                        except Exception as e:
-                            st.error(f"Could not generate model summary: {e}")
                 else:
-                    st.error(f"Failed to load model. This could be due to compatibility issues with TensorFlow or corrupted model files.")
+                    # Partial match based on model name components
+                    model_name_parts = selected_model.split('_')
+                for model_file in model_files:
+                        if any(part in model_file for part in model_name_parts if len(part) > 2):
+                        model_path = group_path / model_file
+                        model_found = True
+                        break
+        except Exception as e:
+            st.error(f"Error searching for model files: {e}")
+            return
+        
+        # Display model info
+        if model_found and model_path:
+            try:
+                # Try to load and visualize the model
+                visualize_keras_model(str(model_path))
+                
+                # Display model file location
+                st.info(f"Model file: {model_path}")
+                        except Exception as e:
+                st.error(f"Error visualizing model: {e}")
+                st.code(traceback.format_exc())
         else:
-            st.error(f"No matching model file found for {selected_model} in group {selected_group}.")
+            st.warning(f"No matching model file found for {selected_model} in {selected_group}.")
             
-            # Show available model files to help diagnose
             if model_files:
-                st.info(f"Available model files in {selected_group}:")
-                for file in model_files:
-                    st.write(f"- {file}")
+                st.info(f"Available model files in {selected_group}: {', '.join(model_files)}")
             else:
-                st.warning(f"No model files found in group {selected_group}.")
+                st.info(f"No model files found in {selected_group}.")
+    else:
+        st.info("Select a model group and model to visualize its architecture.")
 
 def display_training_history(all_histories):
     """Display training history for selected models."""
     st.markdown('<div class="sub-header">Training History</div>', unsafe_allow_html=True)
     
-    # Available metrics
-    all_metrics = set()
-    for group_histories in all_histories.values():
-        for history in group_histories.values():
-            if isinstance(history, dict):
-                all_metrics.update(history.keys())
-            elif hasattr(history, 'history'):
-                all_metrics.update(history.history.keys())
+    # Allow selection of multiple models for comparison
+    col1, col2 = st.columns(2)
     
-    # Filter metrics (убираем служебные)
-    all_metrics = [m for m in all_metrics if not m.startswith('__')]
+    with col1:
+        # Select group
+        selected_group = st.selectbox(
+            "Select Group:",
+            options=list(all_histories.keys())
+        )
     
-    if not all_metrics:
-        st.warning("No metrics found in history data.")
-        return
-    
-    # Select models to display
-    st.subheader("Select Models")
-    
-    # Multiselect for groups
-    selected_groups = st.multiselect(
-        "Select Model Groups:",
-        options=list(all_histories.keys()),
-        default=[next(iter(all_histories.keys()))] if all_histories else []
-    )
-    
-    if not selected_groups:
-        st.warning("Please select at least one model group.")
-        return
-    
-    # Create options for model selection
-    model_options = []
-    for group in selected_groups:
-        for model in all_histories[group]:
-            # Отфильтруем placeholder-модели
-            if model.startswith('placeholder_'):
-                continue
-            model_options.append((group, model))
-    
-    # Select models
-    selected_models = []
-    for group, model in model_options:
-        if st.checkbox(f"{group} - {model}", value=group == selected_groups[0]):
-            selected_models.append((group, model))
-    
-    if not selected_models:
-        st.warning("Please select at least one model.")
-        return
-    
+    with col2:
     # Select metric
     selected_metric = st.selectbox(
         "Select Metric:",
-        options=sorted(list(all_metrics))
-    )
+            options=STANDARD_METRICS,
+            format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
+        )
     
-    # Конвертируем список кортежей в словарь для plot_training_progress
-    models_dict = {}
-    for group, model in selected_models:
-        if group not in models_dict:
-            models_dict[group] = []
-        models_dict[group].append(model)
-    
-    # Create plot
-    fig = plot_training_progress(all_histories, models_dict, selected_metric)
+    if selected_group:
+        # Get models in the selected group
+        models = list(all_histories[selected_group].keys())
+        
+        # Filter out placeholder models
+        models = [model for model in models 
+                 if not (isinstance(all_histories[selected_group][model], dict) 
+                         and all_histories[selected_group][model].get('__placeholder__', False))]
+        
+        if models:
+            # Select models for comparison
+            selected_models = st.multiselect(
+                "Select Models to Compare:",
+                options=models,
+                default=models[:min(3, len(models))]  # Default to first 3 models
+            )
+            
+            if selected_models:
+                # Create list of (group, model) tuples
+                model_tuples = [(selected_group, model) for model in selected_models]
+                
+                # Plot training progress
+                fig = plot_training_progress(all_histories, model_tuples, selected_metric)
     
     if fig:
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning(f"No data available for selected metric: {selected_metric}")
+                    st.warning(f"No training history data available for the selected models and metric: {selected_metric}")
+                
+                # Show detailed metrics for each selected model
+                st.markdown('<div class="sub-header">Model Metrics Details</div>', unsafe_allow_html=True)
+                
+                for model in selected_models:
+                    history = all_histories[selected_group][model]
+                    
+                    # Create expander for each model
+                    with st.expander(f"Model: {model}"):
+                        # Check if history contains the 'history' key with metrics
+                        if isinstance(history, dict) and 'history' in history and isinstance(history['history'], dict):
+                            # Display information about the model
+                            if 'model_name' in history:
+                                st.write(f"**Model Name:** {history['model_name']}")
+                            if 'group_name' in history:
+                                st.write(f"**Group:** {history['group_name']}")
+                            
+                            # Display final metrics if available
+                            if 'metrics' in history and isinstance(history['metrics'], dict):
+                                st.write("**Final Evaluation Metrics:**")
+                                metrics_df = pd.DataFrame({
+                                    'Metric': list(history['metrics'].keys()),
+                                    'Value': list(history['metrics'].values())
+                                })
+                                st.dataframe(metrics_df)
+                            
+                            # Display training history for different metrics
+                            history_data = history['history']
+                            
+                            # Get available metrics
+                            available_metrics = [m for m in STANDARD_METRICS if m in history_data]
+                            
+                            if available_metrics:
+                                # Create tabs for different metric categories
+                                tab1, tab2 = st.tabs(["Error Metrics", "Performance Metrics"])
+                                
+                                # Error metrics tab
+                                with tab1:
+                                    error_metrics = ['rmse', 'mse', 'mae', 'mape', 'max_error', 'median_absolute_error', 'norm_rmse', 'norm_mae']
+                                    error_metrics = [m for m in error_metrics if m in available_metrics]
+                                    
+                                    if error_metrics:
+                                        for metric in error_metrics:
+                                            # Safely check if metric has data and is not None
+                                            if metric in history_data and history_data[metric] is not None and len(history_data[metric]) > 0:
+                                                values = history_data[metric]
+                                                epochs = list(range(1, len(values) + 1))
+                                                
+                                                fig = px.line(
+                                                    x=epochs,
+                                                    y=values,
+                                                    title=f"{METRIC_DISPLAY_NAMES.get(metric, metric)} History",
+                                                    labels={'x': 'Epoch', 'y': metric}
+                                                )
+                                                st.plotly_chart(fig, use_container_width=True)
+                                    else:
+                                        st.info("No error metrics available for this model.")
+                                
+                                # Performance metrics tab
+                                with tab2:
+                                    perf_metrics = ['r2_score', 'explained_variance']
+                                    perf_metrics = [m for m in perf_metrics if m in available_metrics]
+                                    
+                                    if perf_metrics:
+                                        for metric in perf_metrics:
+                                            # Safely check if metric has data and is not None
+                                            if metric in history_data and history_data[metric] is not None and len(history_data[metric]) > 0:
+                                                values = history_data[metric]
+                                                epochs = list(range(1, len(values) + 1))
+                                                
+                                                fig = px.line(
+                                                    x=epochs,
+                                                    y=values,
+                                                    title=f"{METRIC_DISPLAY_NAMES.get(metric, metric)} History",
+                                                    labels={'x': 'Epoch', 'y': metric}
+                                                )
+                                                st.plotly_chart(fig, use_container_width=True)
+                                    else:
+                                        st.info("No performance metrics available for this model.")
+                            else:
+                                st.warning("No training history metrics available for this model.")
+                        else:
+                            st.warning("This model does not have proper training history data.")
+            else:
+                st.info("Select at least one model to view its training history.")
+        else:
+            st.warning(f"No models found in group: {selected_group}")
+    else:
+        st.info("Select a group to view available models.")
 
 def display_model_comparison(all_histories, comparison_df):
-    """Display comparison of models on various metrics."""
+    """Display comparison of models across different metrics."""
     st.markdown('<div class="sub-header">Model Comparison</div>', unsafe_allow_html=True)
     
-    # Get all available metrics from the history data
-    all_metrics = set()
-    for group, models in all_histories.items():
-        for model, history in models.items():
-            # Skip placeholder models
-            if isinstance(history, dict) and history.get('__placeholder__', False):
-                continue
-                
-            all_metrics.update(history.keys())
+    if comparison_df.empty:
+        st.warning("No model metrics available for comparison.")
+        return
     
-    # Remove placeholder flag from metrics
-    if '__placeholder__' in all_metrics:
-        all_metrics.remove('__placeholder__')
+    # Create tabs for different visualization types
+    tab1, tab2, tab3 = st.tabs(["Metric Comparison", "Radar Chart", "Group Comparison"])
     
-    # Filter to show only common metrics and sort alphabetically
-    valid_metrics = sorted([m for m in all_metrics if m != '__placeholder__' and not isinstance(m, bool)])
-    
-    # Metric selection
-    col1, col2 = st.columns([1, 2])
-    
-    with col1:
+    with tab1:
+        # Select metric for comparison
         selected_metric = st.selectbox(
-            "Select metric for comparison:",
-            options=valid_metrics,
-            index=min(1, len(valid_metrics)-1) if len(valid_metrics) > 0 else 0
+            "Select Metric to Compare:",
+            options=STANDARD_METRICS,
+            format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
         )
         
-        # Select display mode
-        display_mode = st.radio(
-            "Display mode:",
-            ["Line chart", "Bar chart", "Radar chart"]
-        )
+        # Create comparison chart
+        fig = plot_metric_comparison(comparison_df, selected_metric)
+        
+        if fig:
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Display explanation about the metric
+            metric_explanations = {
+                'rmse': "**Root Mean Square Error (RMSE)** measures the average magnitude of the prediction errors. Lower values indicate better model performance.",
+                'norm_rmse': "**Normalized RMSE** is the RMSE divided by the range of observed values. This helps compare errors across different scales.",
+                'r2_score': "**R² Score** (Coefficient of Determination) indicates how well the model fits the data. Values closer to 1 indicate better fit.",
+                'explained_variance': "**Explained Variance** measures the proportion of variance in the dependent variable that is predictable from the independent variables.",
+                'mae': "**Mean Absolute Error (MAE)** measures the average magnitude of errors without considering their direction. Lower values are better.",
+                'mape': "**Mean Absolute Percentage Error (MAPE)** measures prediction accuracy as a percentage. Lower values indicate better accuracy.",
+                'max_error': "**Maximum Error** shows the maximum residual error, representing the worst case prediction. Lower is better.",
+                'median_absolute_error': "**Median Absolute Error** is the median of all absolute differences between the target and the prediction. Less sensitive to outliers.",
+                'mse': "**Mean Squared Error (MSE)** is the average of squared differences between predicted and actual values. Lower values indicate better fit.",
+                'norm_mae': "**Normalized MAE** is the MAE divided by the range of observed values. Helps compare errors across different scales."
+            }
+            
+            if selected_metric in metric_explanations:
+                st.markdown(metric_explanations[selected_metric])
+        else:
+            st.warning(f"No data available for metric: {selected_metric}")
     
-    with col2:
-        # Model selection
-        model_options = {}
+    with tab2:
+        # Select metrics for radar chart
+        selected_metrics = st.multiselect(
+            "Select Metrics for Radar Chart:",
+            options=STANDARD_METRICS,
+            default=STANDARD_METRICS[:5],  # Default to first 5 metrics
+            format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
+        )
         
-        # Organize models by group for the selection UI
+        # Select models to include
+        all_models = []
         for group in all_histories:
             for model in all_histories[group]:
-                # Skip placeholders
-                if model.startswith('placeholder_') or (
-                   isinstance(all_histories[group][model], dict) and 
+                if not (isinstance(all_histories[group][model], dict) and 
                    all_histories[group][model].get('__placeholder__', False)):
-                    continue
-                    
-                # Add to selection options
-                model_id = f"{group}|{model}"
-                model_options[model_id] = f"{model} ({group})"
+                    all_models.append((group, model))
         
-        # Allow selecting multiple models for comparison
-        if model_options:
-            default_models = list(model_options.keys())[:min(5, len(model_options))]
             selected_models = st.multiselect(
-                "Select models to compare:",
-                options=list(model_options.keys()),
-                format_func=lambda x: model_options[x],
-                default=default_models
-            )
-        else:
-            selected_models = []
-            st.warning("No models found for comparison")
-    
-    if not valid_metrics:
-        st.warning("No metrics found in the history data.")
-        return
-    
-    if not selected_models:
-        st.warning("Please select at least one model for comparison.")
-        return
-    
-    # Display the selected visualization
-    if display_mode == "Line chart" and selected_metric and selected_models:
-        # Convert selected_models to dictionary for plot_training_progress
-        models_dict = {}
-        for model_id in selected_models:
-            group, model = model_id.split('|')
-            if group not in models_dict:
-                models_dict[group] = []
-            models_dict[group].append(model)
-        
-        # Plot line chart
-        st.subheader(f"Training Progress: {selected_metric}")
-        progress_fig = plot_training_progress(all_histories, models_dict, selected_metric)
-        if progress_fig:
-            st.plotly_chart(progress_fig, use_container_width=True)
-        else:
-            st.warning(f"Could not generate training progress chart for {selected_metric}.")
-    
-    elif display_mode == "Bar chart" and selected_metric and selected_models:
-        # Create bar chart using plotly
-        st.subheader(f"Final {selected_metric} Comparison")
-        
-        # Collect data for bar chart
-        bar_data = []
-        
-        for model_id in selected_models:
-            group, model = model_id.split('|')
-            
-            # Skip if model not in histories
-            if group not in all_histories or model not in all_histories[group]:
-                continue
-                
-            history = all_histories[group][model]
-            
-            # Skip placeholder models
-            if isinstance(history, dict) and history.get('__placeholder__', False):
-                continue
-                
-            # Check if metric exists
-            if selected_metric not in history:
-                continue
-                
-            # Get final value
-            final_value = history[selected_metric][-1]
-            
-            bar_data.append({
-                'Model': f"{model} ({group})",
-                'Value': final_value
-            })
-        
-        if bar_data:
-            # Create bar chart
-            bar_df = pd.DataFrame(bar_data)
-            fig = px.bar(
-                bar_df, 
-                x='Model', 
-                y='Value',
-                title=f"Final {selected_metric} Comparison",
-                color='Model'
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.warning(f"No data available for {selected_metric} in the selected models.")
-    
-    elif display_mode == "Radar chart" and selected_models:
-        st.subheader("Multi-Metric Comparison (Radar Chart)")
-        
-        # Allow selecting metrics for radar chart
-        selected_radar_metrics = st.multiselect(
-            "Select metrics for radar chart:",
-            options=valid_metrics,
-            default=valid_metrics[:min(5, len(valid_metrics))]
+            "Select Models to Include (max 5):",
+            options=[(f"{model} ({group})") for group, model in all_models],
+            default=[f"{all_models[i][1]} ({all_models[i][0]})" for i in range(min(3, len(all_models)))]
         )
         
-        if selected_radar_metrics:
-            # Filter comparison df to only selected models and metrics
-            filtered_models = []
-            for model_id in selected_models:
-                group, model = model_id.split('|')
-                filtered_models.append((group, model))
+        # Limit to max 5 models for readability
+        if len(selected_models) > 5:
+            st.warning("For better readability, only the first 5 selected models will be shown in the radar chart.")
+            selected_models = selected_models[:5]
+        
+        if selected_metrics and selected_models:
+            # Filter comparison_df to include only selected models
+            selected_model_tuples = []
+            for model_str in selected_models:
+                # Extract model and group from the combined string
+                model, group = model_str.split(" (")
+                group = group.rstrip(")")
+                selected_model_tuples.append((group, model))
             
-            # Create radar chart
-            if comparison_df is not None and not comparison_df.empty:
-                filtered_df = comparison_df[
-                    comparison_df.apply(
-                        lambda row: (row['Group'], row['Model']) in filtered_models, 
-                        axis=1
-                    )
-                ]
+            filtered_df = comparison_df[
+                comparison_df.apply(
+                    lambda row: (row['Group'], row['Model']) in [(group, model) for group, model in selected_model_tuples], 
+                    axis=1
+                )
+            ]
+            
+            if not filtered_df.empty and len(selected_metrics) > 0:
+                # Create radar chart
+                fig = create_radar_chart(filtered_df, metrics=selected_metrics)
                 
-                if not filtered_df.empty:
-                    radar_fig = create_radar_chart(filtered_df, selected_radar_metrics)
-                    if radar_fig:
-                        st.plotly_chart(radar_fig, use_container_width=True)
-                    else:
-                        st.warning("Could not create radar chart. Check if metrics data is available.")
+                if fig:
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Add explanation about normalization
+                    st.markdown("""
+                    **Note about the Radar Chart:**
+                    - The metrics are normalized to a scale of 0-1, where 1 always represents the best performance.
+                    - For error metrics (RMSE, MAE, etc.), lower original values are better, so the scale is inverted.
+                    - For performance metrics (R², explained variance), higher values are better.
+                    """)
                 else:
-                    st.warning("No matching data found for selected models in the comparison dataframe.")
+                    st.warning("Unable to create radar chart with the selected data.")
             else:
-                st.warning("No comparison data available for creating radar chart.")
+                st.warning("No data available for the selected models and metrics.")
         else:
-            st.info("Please select at least one metric for the radar chart.")
+            st.info("Select at least one metric and one model to create a radar chart.")
+    
+    with tab3:
+        # Group comparison
+        st.subheader("Compare Model Groups")
+        
+        # Calculate group averages
+        if 'Group' in comparison_df.columns:
+            # Create group metrics for each standardized metric
+            group_metrics = []
+            
+            for group in comparison_df['Group'].unique():
+                group_data = {'Group': group}
+                
+                # Filter dataframe for this group
+                group_df = comparison_df[comparison_df['Group'] == group]
+                
+                # Calculate average for each metric
+                for metric in STANDARD_METRICS:
+                    if metric in group_df.columns:
+                        group_data[f'avg_{metric}'] = group_df[metric].mean()
+                        group_data[f'best_{metric}'] = group_df[metric].min() if not HIGHER_IS_BETTER.get(metric, False) else group_df[metric].max()
+                
+                # Add count of models
+                group_data['model_count'] = len(group_df)
+                
+                group_metrics.append(group_data)
+            
+            # Create dataframe
+            if group_metrics:
+                group_df = pd.DataFrame(group_metrics)
+                
+                # Display model counts
+                st.write("**Number of Models per Group:**")
+                
+                # Create bar chart for model counts
+                fig = px.bar(
+                    group_df,
+                    x='Group',
+                    y='model_count',
+                    title='Models per Group',
+                    labels={'model_count': 'Number of Models', 'Group': 'Group'},
+                    color='Group'
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Select metric for group comparison
+                selected_metric = st.selectbox(
+                    "Select Metric for Group Comparison:",
+                    options=STANDARD_METRICS,
+                    format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x),
+                    key="group_comparison_metric"
+                )
+                
+                if selected_metric:
+                    # Create tabs for different comparison types
+                    tab_avg, tab_best = st.tabs(["Average Performance", "Best Performance"])
+                    
+                    with tab_avg:
+                        # Average performance
+                        avg_col = f'avg_{selected_metric}'
+                        
+                        if avg_col in group_df.columns:
+            # Create bar chart
+            fig = px.bar(
+                                group_df,
+                                x='Group',
+                                y=avg_col,
+                                title=f'Average {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)} by Group',
+                                labels={avg_col: f'Average {selected_metric}', 'Group': 'Group'},
+                                color='Group'
+                            )
+                            
+                            # Adjust y-axis (lower bound for better metrics)
+                            if not HIGHER_IS_BETTER.get(selected_metric, False):
+                                fig.update_layout(yaxis_range=[0, group_df[avg_col].max() * 1.1])
+                            
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+                            st.warning(f"No average data available for metric: {selected_metric}")
+                    
+                    with tab_best:
+                        # Best performance
+                        best_col = f'best_{selected_metric}'
+                        
+                        if best_col in group_df.columns:
+                            # Create bar chart
+                            fig = px.bar(
+                                group_df,
+                                x='Group',
+                                y=best_col,
+                                title=f'Best {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)} by Group',
+                                labels={best_col: f'Best {selected_metric}', 'Group': 'Group'},
+                                color='Group'
+                            )
+                            
+                            # Adjust y-axis (lower bound for better metrics)
+                            if not HIGHER_IS_BETTER.get(selected_metric, False):
+                                fig.update_layout(yaxis_range=[0, group_df[best_col].max() * 1.1])
+                            
+                            st.plotly_chart(fig, use_container_width=True)
+                    else:
+                            st.warning(f"No best performance data available for metric: {selected_metric}")
+            else:
+                st.warning("No group data available for comparison.")
+        else:
+            st.warning("Group information not available in the metrics data.")
 
 def display_best_models(all_histories):
-    """Display the best models by group."""
-    st.markdown('<div class="sub-header">Best Models</div>', unsafe_allow_html=True)
+    """Display the best performing models based on different metrics."""
+    st.markdown('<div class="sub-header">Best Performing Models</div>', unsafe_allow_html=True)
     
-    # Select metric for evaluation
-    metrics = set()
-    for group, models in all_histories.items():
-        for model, history in models.items():
-            if hasattr(history, 'history'):
-                metrics.update(history.history.keys())
-            elif isinstance(history, dict):
-                metrics.update(history.keys())
-    
-    metrics = sorted(list(metrics))
-    
-    if not metrics:
-        st.warning("No metrics found in model histories.")
-        return
-        
+    # Select metric for determining best models
     selected_metric = st.selectbox(
-        "Select metric to identify best models:",
-        options=metrics
+        "Select Metric for Ranking:",
+        options=STANDARD_METRICS,
+        format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
     )
     
-    if not selected_metric:
-        st.warning("Please select a metric to continue.")
-        return
+    # Determine if higher is better for this metric
+    is_higher_better = HIGHER_IS_BETTER.get(selected_metric, False)
     
-    # Determine if higher is better based on metric name
-    is_higher_better = not ('loss' in selected_metric.lower())
-    
-    if st.button(f"Find Best Models by {selected_metric}"):
-        # Get best models for each group
+    # Get best models based on the selected metric
         best_models = get_best_models(all_histories, metric=selected_metric, is_higher_better=is_higher_better)
         
         if best_models:
-            # Create comparison table
-            best_data = []
-            for group, info in best_models.items():
-                model_name = info['model']
-                value = info['value']
-                
-                best_data.append({
-                    "Group": group,
-                    "Best Model": model_name,
-                    selected_metric: value
-                })
-            
-            best_df = pd.DataFrame(best_data)
-            
-            # Display table with best models
-            st.subheader("Best Models by Group")
+        # Create dataframe for best models
+        best_df = pd.DataFrame([
+            {
+                'Group': group,
+                'Model': info['model'],
+                selected_metric: info['value']
+            }
+            for group, info in best_models.items()
+        ])
+        
+        # Sort based on metric (ascending or descending based on is_higher_better)
+        best_df = best_df.sort_values(by=selected_metric, ascending=not is_higher_better)
+        
+        # Display as table
+        st.write(f"**Best Models by {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)}:**")
             st.dataframe(best_df)
             
-            # Create visual comparison
+        # Create bar chart
             fig = px.bar(
                 best_df,
-                x="Group",
+            x='Group',
                 y=selected_metric,
-                color="Best Model",
-                title=f"Best Models by {selected_metric}",
-                hover_data=["Group", "Best Model"]
-            )
+            color='Model',
+            title=f'Best Models by {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)}',
+            barmode='group',
+            text='Model'
+        )
+        
+        # Adjust label positions
+        fig.update_traces(textposition='outside')
+        
+        # Adjust y-axis (lower bound for better metrics)
+        if not is_higher_better:
+            fig.update_layout(yaxis_range=[0, best_df[selected_metric].max() * 1.1])
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Display information about each best model
+        st.markdown('<div class="sub-header">Detailed Information</div>', unsafe_allow_html=True)
+        
+        for group, info in best_models.items():
+            model_name = info['model']
             
+            with st.expander(f"Best model in {group}: {model_name}"):
+                if group in all_histories and model_name in all_histories[group]:
+                    history = all_histories[group][model_name]
+                    
+                    # Check if history contains the necessary information
+                    if isinstance(history, dict):
+                        if 'model_name' in history:
+                            st.write(f"**Model Name:** {history['model_name']}")
+                        if 'group_name' in history:
+                            st.write(f"**Group:** {history['group_name']}")
+                        
+                        # Display final metrics if available
+                        if 'metrics' in history and isinstance(history['metrics'], dict):
+                            st.write("**Final Evaluation Metrics:**")
+                            
+                            # Create two columns for metrics display
+                            col1, col2 = st.columns(2)
+                            
+                            metrics = sorted(history['metrics'].keys())
+                            half = len(metrics) // 2
+                            
+                            # First column of metrics
+                            with col1:
+                                for metric in metrics[:half]:
+                                    display_name = METRIC_DISPLAY_NAMES.get(metric, metric)
+                                    value = history['metrics'][metric]
+                                    st.metric(label=display_name, value=f"{value:.4f}")
+                            
+                            # Second column of metrics
+                            with col2:
+                                for metric in metrics[half:]:
+                                    display_name = METRIC_DISPLAY_NAMES.get(metric, metric)
+                                    value = history['metrics'][metric]
+                                    st.metric(label=display_name, value=f"{value:.4f}")
+                        
+                        # Display training history for best metric
+                        if 'history' in history and isinstance(history['history'], dict):
+                            if selected_metric in history['history'] and history['history'][selected_metric] is not None and len(history['history'][selected_metric]) > 0:
+                                st.write(f"**Training History for {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)}:**")
+                                
+                                values = history['history'][selected_metric]
+                                epochs = list(range(1, len(values) + 1))
+                                
+                                fig = px.line(
+                                    x=epochs,
+                                    y=values,
+                                    title=f"{METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)} History",
+                                    labels={'x': 'Epoch', 'y': selected_metric}
+                                )
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.warning(f"No comparable models found using metric: {selected_metric}")
+                        st.warning("Model history data is not in the expected format.")
+                else:
+                    st.warning(f"Model information not found for {model_name} in {group}.")
+    else:
+        st.warning("No best models found for the selected metric.")
 
 if __name__ == "__main__":
     main() 
