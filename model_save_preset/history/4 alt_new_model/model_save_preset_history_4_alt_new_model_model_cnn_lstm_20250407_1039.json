@@ -1,0 +1,16 @@
+{
+  "history": {
+    "mse": 0.11575664651555087,
+    "mae": 0.2993946208717244,
+    "rmse": 0.3402302845361519,
+    "r2": -1.2620719192655931,
+    "explained_var": -0.2959803903616782,
+    "max_error": 0.7605115495364498,
+    "median_abs_error": 0.30300999875918255,
+    "mape": NaN
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "model_cnn_lstm_20250407_1039",
+  "group_name": "4 alt_new_model"
+}

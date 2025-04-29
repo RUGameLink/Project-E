@@ -1,0 +1,1946 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from pathlib import Path
+import sys
+import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+import traceback
+import logging
+import datetime
+from logging.handlers import RotatingFileHandler
+# Обернем импорт tensorflow в try-except
+try:
+    import tensorflow as tf
+    TENSORFLOW_AVAILABLE = True
+except ImportError:
+    TENSORFLOW_AVAILABLE = False
+    tf = None  # Define tf as None to avoid "tf is possibly unbound" error
+import json
+import io
+import math
+import re
+import csv
+from PIL import Image
+import tempfile
+import glob
+import base64
+
+# Настройка логирования
+log_dir = Path("logs")
+log_dir.mkdir(exist_ok=True)
+
+log_file = log_dir / f"dashboard_{datetime.datetime.now().strftime('%Y%m%d')}.log"
+log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+file_handler = RotatingFileHandler(
+    log_file, 
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5,
+    encoding='utf-8'
+)
+file_handler.setFormatter(log_formatter)
+
+logger = logging.getLogger("dashboard")
+logger.setLevel(logging.INFO)
+logger.addHandler(file_handler)
+
+# Функция для логирования и отображения ошибок
+def log_error(error, section=None, context=None):
+    """Логирует ошибку и показывает информацию пользователю."""
+    error_msg = str(error)
+    tb = traceback.format_exc()
+    
+    # Логируем ошибку
+    if section:
+        logger.error(f"Ошибка в секции '{section}': {error_msg}")
+    else:
+        logger.error(f"Ошибка: {error_msg}")
+    
+    if context:
+        logger.error(f"Контекст: {context}")
+    
+    logger.error(f"Traceback: {tb}")
+    
+    # Показываем информацию пользователю
+    st.error(f"Произошла ошибка: {error_msg}")
+    
+    # Опционально показываем traceback для разработчиков
+    with st.expander("Техническая информация"):
+        st.code(tb)
+        if context:
+            st.write(f"Контекст: {context}")
+
+# Логируем запуск приложения
+logger.info("Дашборд запущен")
+
+# Настройка для отображения кириллицы
+plt.rcParams['font.family'] = 'DejaVu Sans'
+
+# Add visualization directory to path
+current_dir = Path(__file__).parent
+if str(current_dir) not in sys.path:
+    sys.path.append(str(current_dir))
+
+# Стандартные импорты
+import io
+import tempfile
+from PIL import Image  # Добавляем импорт Image для работы с изображениями
+
+# Import functions from modules - определим для линтера
+try:
+    from model_comparison_utils import (
+        load_all_histories,
+        get_best_models,
+        create_metrics_comparison,
+        plot_metric_comparison,
+        create_radar_chart,
+        plot_training_progress
+    )
+    MODEL_COMPARISON_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Ошибка импорта модуля сравнения моделей: {e}")
+    MODEL_COMPARISON_AVAILABLE = False
+
+# Закомментируем импорт модуля визуализации архитектур
+# Попытка импорта архитектурных функций
+try:
+    import model_architecture
+    # from model_architecture import visualize_keras_model
+    MODEL_ARCHITECTURE_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Ошибка импорта модуля архитектуры моделей: {e}")
+    MODEL_ARCHITECTURE_AVAILABLE = False
+
+# Определение функций для работы с данными
+def load_data(file_path):
+    """Загружает данные из файла."""
+    try:
+        if isinstance(file_path, str) or isinstance(file_path, Path):
+            return pd.read_csv(file_path)
+        else:
+            # Для загруженных через Streamlit файлов
+            return pd.read_csv(file_path)
+    except Exception as e:
+        log_error(e, section="load_data", context=f"file_path: {file_path}")
+        return None
+
+# Определение функций для анализа данных
+def create_data_preview(df):
+    """Создает предпросмотр данных с базовой статистикой."""
+    preview = {}
+    preview["shape"] = df.shape
+    preview["head"] = df.head(5)
+    preview["describe"] = df.describe()
+    preview["info"] = df.dtypes
+    preview["missing"] = df.isnull().sum()
+    return preview
+
+def create_distribution_plots(df, columns):
+    """Создает графики распределения для выбранных колонок."""
+    figs = []
+    for col in columns:
+        fig = px.histogram(df, x=col, title=f"Распределение {col}")
+        figs.append(fig)
+    return figs
+
+def create_correlation_heatmap(df):
+    """Создает тепловую карту корреляций."""
+    # Выбираем только числовые столбцы
+    numeric_df = df.select_dtypes(include=['number'])
+    
+    # Вычисляем корреляцию
+    corr = numeric_df.corr()
+    
+    # Создаем тепловую карту
+    fig = px.imshow(
+        corr,
+        text_auto=True,
+        aspect="auto",
+        color_continuous_scale='RdBu_r',
+        title="Матрица корреляций"
+    )
+    return fig
+
+def create_timeseries_analysis(df, time_col, target_cols):
+    """Создает графики временных рядов."""
+    figs = []
+    for col in target_cols:
+        fig = px.line(df, x=time_col, y=col, title=f"Временной ряд {col}")
+        figs.append(fig)
+    return figs
+
+# Функции для работы с моделями и их результатами
+def parse_model_results(file_path):
+    """Парсит результаты обучения модели из CSV-файла."""
+    try:
+        # Загружаем CSV с результатами
+        if isinstance(file_path, str) or isinstance(file_path, Path):
+            results_df = pd.read_csv(file_path)
+        else:
+            # Для загруженных через Streamlit файлов
+            results_df = pd.read_csv(file_path)
+        
+        # Создаем структуру данных для хранения информации о модели
+        model_name = os.path.basename(str(file_path)).replace("_results.csv", "")
+        model_data = {
+            "name": model_name,
+            "metrics": {},
+            "feature_importance": {},
+            "predictions": None,
+            "actual": None,
+            "training_history": {}
+        }
+        
+        # Извлекаем метрики
+        for metric in STANDARD_METRICS:
+            if metric in results_df.columns:
+                model_data["metrics"][metric] = results_df[metric].iloc[0]
+        
+        # Получаем важность признаков, если есть
+        feature_cols = [col for col in results_df.columns if col.startswith("feature_")]
+        if feature_cols:
+            # Первая строка содержит важность признаков
+            for col in feature_cols:
+                feature_name = col.replace("feature_", "")
+                model_data["feature_importance"][feature_name] = results_df[col].iloc[0]
+        
+        # Получаем историю обучения, если есть
+        history_cols = [col for col in results_df.columns if col.startswith("history_")]
+        if history_cols:
+            for col in history_cols:
+                metric_name = col.replace("history_", "")
+                # Предполагаем, что история хранится как строка списка
+                history_str = results_df[col].iloc[0]
+                if isinstance(history_str, str):
+                    try:
+                        # Пытаемся преобразовать строку в список
+                        history_values = json.loads(history_str)
+                        model_data["training_history"][metric_name] = history_values
+                    except:
+                        # Если не удалось преобразовать, просто пропускаем
+                        pass
+        
+        # Получаем предсказания и фактические значения, если есть
+        if "predictions" in results_df.columns:
+            try:
+                predictions_str = results_df["predictions"].iloc[0]
+                model_data["predictions"] = json.loads(predictions_str)
+            except:
+                pass
+        
+        if "actual" in results_df.columns:
+            try:
+                actual_str = results_df["actual"].iloc[0]
+                model_data["actual"] = json.loads(actual_str)
+            except:
+                pass
+        
+        return model_data
+    
+    except Exception as e:
+        log_error(e, section="parse_model_results", context=f"file_path: {file_path}")
+        return None
+
+def create_model_comparison(models_data):
+    """Создает график сравнения метрик моделей."""
+    # Собираем данные для построения
+    models = []
+    metrics = []
+    values = []
+    
+    for model_data in models_data:
+        model_name = model_data["name"]
+        for metric, value in model_data["metrics"].items():
+            models.append(model_name)
+            metrics.append(METRIC_DISPLAY_NAMES.get(metric, metric))
+            values.append(value)
+    
+    # Создаем DataFrame для построения
+    df = pd.DataFrame({
+        "Модель": models,
+        "Метрика": metrics,
+        "Значение": values
+    })
+    
+    # Создаем график
+    fig = px.bar(
+        df,
+        x="Модель",
+        y="Значение",
+        color="Метрика",
+        barmode="group",
+        title="Сравнение метрик моделей"
+    )
+    
+    return fig
+
+def create_feature_importance_plot(model_data):
+    """Создает график важности признаков."""
+    if not model_data["feature_importance"]:
+        return None
+    
+    # Сортируем признаки по важности
+    sorted_features = sorted(
+        model_data["feature_importance"].items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+    
+    features = [item[0] for item in sorted_features]
+    importance = [item[1] for item in sorted_features]
+    
+    # Создаем график
+    fig = px.bar(
+        x=importance,
+        y=features,
+        orientation='h',
+        title=f"Важность признаков для модели {model_data['name']}"
+    )
+    
+    return fig
+
+def create_prediction_plots(model_data):
+    """Создает графики сравнения прогнозов с фактическими значениями."""
+    figs = []
+    
+    if not model_data["predictions"] or not model_data["actual"]:
+        return figs
+    
+    # Получаем данные
+    predictions = model_data["predictions"]
+    actual = model_data["actual"]
+    
+    # Создаем график сравнения
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatter(
+        y=actual,
+        mode="lines",
+        name="Фактические значения"
+    ))
+    
+    fig.add_trace(go.Scatter(
+        y=predictions,
+        mode="lines",
+        name="Прогноз модели",
+        line=dict(dash="dash")
+    ))
+    
+    fig.update_layout(
+        title=f"Сравнение прогнозов модели {model_data['name']} с фактическими значениями",
+        xaxis_title="Временной шаг",
+        yaxis_title="Значение"
+    )
+    
+    figs.append(fig)
+    
+    # Добавляем график ошибок
+    errors = [pred - act for pred, act in zip(predictions, actual)]
+    
+    fig_errors = go.Figure()
+    
+    fig_errors.add_trace(go.Scatter(
+        y=errors,
+        mode="lines",
+        name="Ошибка прогноза"
+    ))
+    
+    fig_errors.update_layout(
+        title=f"Ошибки прогнозирования модели {model_data['name']}",
+        xaxis_title="Временной шаг",
+        yaxis_title="Ошибка (прогноз - факт)"
+    )
+    
+    figs.append(fig_errors)
+    
+    return figs
+
+# Set page configuration
+st.set_page_config(
+    page_title="Neural Network Models Dashboard",
+    page_icon="🧠",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Set paths
+BASE_PATH = Path("../model_save_preset")
+MODELS_PATH = BASE_PATH / "models"
+HISTORY_PATH = BASE_PATH / "history"
+DEFAULT_DATA_PATH = Path("../data/processed/sample_data.csv")
+
+# Define standard metrics used in the updated history format
+STANDARD_METRICS = [
+    'rmse',
+    'explained_variance',
+    'mae',
+    'max_error',
+    'mse'
+]
+
+# Define metrics where higher values are better
+HIGHER_IS_BETTER = {
+    'explained_variance': True,
+    'rmse': False,
+    'mse': False,
+    'mae': False,
+    'max_error': False
+}
+
+# Friendly display names for metrics
+METRIC_DISPLAY_NAMES = {
+    'rmse': 'Корень из среднеквадратичной ошибки (RMSE)',
+    'explained_variance': 'Объяснённая дисперсия',
+    'mae': 'Средняя абсолютная ошибка (MAE)',
+    'max_error': 'Максимальная ошибка',
+    'mse': 'Среднеквадратичная ошибка (MSE)'
+}
+
+# Функция для сбора системной информации
+def log_system_info():
+    """Собирает и логирует информацию о системе."""
+    try:
+        import platform
+        import sys
+        
+        system_info = {
+            "OS": platform.platform(),
+            "Python": platform.python_version(),
+            "TensorFlow": "Не доступен" if not TENSORFLOW_AVAILABLE else tf.__version__,
+            "NumPy": np.__version__,
+            "Pandas": pd.__version__,
+            "Streamlit": st.__version__,
+            "Работающий каталог": os.getcwd(),
+            "PATH к моделям": str(MODELS_PATH),
+            "PATH к истории": str(HISTORY_PATH)
+        }
+        
+        logger.info("Системная информация:")
+        for key, value in system_info.items():
+            logger.info(f"  {key}: {value}")
+        
+        # Проверяем наличие директорий с данными
+        if os.path.exists(MODELS_PATH):
+            logger.info(f"Директория моделей существует: {MODELS_PATH}")
+            model_files = list(MODELS_PATH.glob("**/*.h5"))
+            logger.info(f"Найдено {len(model_files)} файлов моделей")
+        else:
+            logger.warning(f"Директория моделей не найдена: {MODELS_PATH}")
+        
+        if os.path.exists(HISTORY_PATH):
+            logger.info(f"Директория истории существует: {HISTORY_PATH}")
+            history_files = list(HISTORY_PATH.glob("**/*.json"))
+            logger.info(f"Найдено {len(history_files)} файлов истории")
+        else:
+            logger.warning(f"Директория истории не найдена: {HISTORY_PATH}")
+        
+    except Exception as e:
+        log_error(e, section="log_system_info")
+
+def main():
+    try:
+        logger.info("Запуск основной функции дашборда")
+        
+        # Add custom CSS
+        st.markdown("""
+        <style>
+        .main-header {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4F8BF9;
+            margin-bottom: 1rem;
+        }
+        .sub-header {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1F618D;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .section-divider {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Application title
+        st.markdown('<div class="main-header">Панель управления моделями нейронных сетей</div>', unsafe_allow_html=True)
+        
+        # Load all model histories
+        logger.info(f"Загрузка историй моделей из директории: {BASE_PATH}")
+        
+        if MODEL_COMPARISON_AVAILABLE:
+            all_histories = load_all_histories(str(BASE_PATH))
+            
+            if not all_histories:
+                logger.warning("Истории моделей не найдены")
+                st.warning("Не удалось найти истории обучения моделей.")
+                st.info("Проверьте, что директории с моделями и историями существуют и содержат файлы.")
+            else:
+                logger.info(f"Загружено {len(all_histories)} историй моделей")
+                # Продолжаем выполнение с загруженными историями
+                create_dashboard_pages()
+        else:
+            # Если модуль сравнения моделей недоступен
+            st.warning("Модуль сравнения моделей не доступен. Некоторые функции дашборда будут ограничены.")
+            # Показываем ограниченную версию дашборда без сравнения моделей
+            st.info("Используется ограниченный режим работы дашборда.")
+            display_data_analysis_page()  # Показываем только анализ данных
+        
+        # Sidebar
+        st.sidebar.title("Навигация")
+        
+        # Navigation
+        pages = [
+            "Обзор моделей",
+            "История обучения",
+            "Сравнение моделей",
+            "Лучшие модели",
+            "Структура моделей"
+        ]
+        
+        selected_page = st.sidebar.radio("Выберите раздел", pages)
+        logger.info(f"Переход на страницу: {selected_page}")
+        
+        # Добавляем секцию для диагностики
+        st.sidebar.markdown("---")
+        st.sidebar.title("Диагностика")
+        
+        # Добавляем кнопку для выгрузки лог-файлов
+        if st.sidebar.button("Выгрузить логи"):
+            try:
+                log_files = list(log_dir.glob("*.log"))
+                
+                if log_files:
+                    # Создаем selectbox для выбора лог-файла
+                    selected_log = st.sidebar.selectbox(
+                        "Выберите лог-файл:", 
+                        options=log_files,
+                        format_func=lambda x: x.name
+                    )
+                    
+                    if selected_log:
+                        # Читаем содержимое файла
+                        with open(selected_log, 'r', encoding='utf-8') as f:
+                            log_content = f.read()
+                        
+                        # Создаем кнопку для скачивания лог-файла
+                        st.sidebar.download_button(
+                            label="Скачать лог-файл",
+                            data=log_content,
+                            file_name=selected_log.name,
+                            mime="text/plain"
+                        )
+                        
+                        # Показываем последние 20 строк лога
+                        st.sidebar.markdown("### Последние записи лога:")
+                        log_lines = log_content.splitlines()
+                        
+                        if len(log_lines) > 20:
+                            log_preview = "\n".join(log_lines[-20:])
+                        else:
+                            log_preview = log_content
+                        
+                        st.sidebar.code(log_preview, language="text")
+                else:
+                    st.sidebar.warning("Лог-файлы не найдены")
+                    logger.warning("Попытка выгрузки логов: файлы не найдены")
+            except Exception as e:
+                st.sidebar.error(f"Ошибка при чтении лог-файлов: {e}")
+                logger.error(f"Ошибка при чтении лог-файлов: {e}")
+        
+        # Create metrics comparison dataframe
+        try:
+            logger.info("Создание таблицы сравнения метрик")
+            comparison_df = create_metrics_comparison(all_histories, metrics=STANDARD_METRICS)
+            logger.info(f"Создана таблица сравнения с {len(comparison_df)} моделями")
+        except Exception as e:
+            log_error(e, section="create_metrics_comparison", context=f"metrics={STANDARD_METRICS}")
+            comparison_df = pd.DataFrame()
+        
+        # Display selected page
+        try:
+            if selected_page == "Обзор моделей":
+                display_model_overview(all_histories, comparison_df)
+            elif selected_page == "История обучения":
+                display_training_history(all_histories)
+            elif selected_page == "Сравнение моделей":
+                display_model_comparison(all_histories, comparison_df)
+            elif selected_page == "Лучшие модели":
+                display_best_models(all_histories)
+            elif selected_page == "Структура моделей":
+                display_model_structure(all_histories)
+        except Exception as e:
+            log_error(e, section=selected_page)
+
+    except Exception as e:
+        log_error(e, section="main")
+
+def display_model_overview(all_histories, comparison_df):
+    """Display overview of all models."""
+    st.markdown('<div class="sub-header">Обзор моделей</div>', unsafe_allow_html=True)
+    
+    # Пересоздаем таблицу сравнения для свежих данных
+    try:
+        comparison_df = create_metrics_comparison(all_histories, metrics=STANDARD_METRICS)
+        logger.info(f"Обновлена таблица сравнения с {len(comparison_df)} моделями для страницы обзора")
+    except Exception as e:
+        logger.error(f"Ошибка при обновлении таблицы сравнения: {e}")
+    
+    # Динамически определяем доступные группы из словаря all_histories
+    available_groups = list(all_histories.keys())
+    
+    # Count models by group - считаем только реальные модели, не заглушки
+    model_counts = {}
+    total_models = 0
+    for group in available_groups:
+        if group in all_histories:
+            # Count non-placeholder models
+            real_models = [model for model, history in all_histories[group].items() 
+                        if not (isinstance(history, dict) and history.get('__placeholder__', False))]
+            model_counts[group] = len(real_models)
+            total_models += len(real_models)
+    
+    # Create metrics for display
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.metric("Всего групп моделей", len(available_groups))
+        
+        # Display models by group
+        st.subheader("Модели по группам")
+        for group in sorted(available_groups):
+            count = model_counts.get(group, 0)
+            st.write(f"**{group}:** {count} моделей")
+    
+    with col2:
+        st.metric("Всего моделей", total_models)
+        
+        # Pie chart of models by group
+        if model_counts:
+            # Filter out groups with zero models for the chart
+            non_empty_groups = {k: v for k, v in model_counts.items() if v > 0}
+            
+            # Create pie chart
+            if non_empty_groups:
+                fig = px.pie(
+                    values=list(non_empty_groups.values()),
+                    names=list(non_empty_groups.keys()),
+                    title="Распределение моделей по группам"
+                )
+                st.plotly_chart(fig)
+            else:
+                st.warning("Не найдено моделей ни в одной группе.")
+    
+    # Display model metrics table
+    st.markdown('<div class="sub-header">Обзор метрик моделей</div>', unsafe_allow_html=True)
+    
+    if not comparison_df.empty:
+        # Make sure comparison dataframe has entries for all expected groups
+        if 'group' in comparison_df.columns:
+            available_groups = comparison_df['group'].unique().tolist()
+            missing_groups = [g for g in all_histories.keys() if g not in available_groups]
+            
+            if missing_groups:
+                st.warning(f"Примечание: Для следующих групп моделей нет доступных метрик: {', '.join(missing_groups)}")
+        
+        # Удаляем столбцы mape, r2, norm_rmse, norm_mae и median_absolute_error из таблицы, если они есть
+        columns_to_drop = []
+        if 'mape' in comparison_df.columns:
+            columns_to_drop.append('mape')
+        if 'r2' in comparison_df.columns:
+            columns_to_drop.append('r2')
+        if 'r2_score' in comparison_df.columns:
+            columns_to_drop.append('r2_score')
+        if 'norm_rmse' in comparison_df.columns:
+            columns_to_drop.append('norm_rmse')
+        if 'norm_mae' in comparison_df.columns:
+            columns_to_drop.append('norm_mae')
+        if 'median_absolute_error' in comparison_df.columns:
+            columns_to_drop.append('median_absolute_error')
+            
+        if columns_to_drop:
+            comparison_df = comparison_df.drop(columns=columns_to_drop)
+            
+        # Allow sorting by different columns, исключая только group и model
+        sort_by = st.selectbox(
+            "Сортировать по метрике:", 
+            [col for col in comparison_df.columns if col not in ["group", "model"]]
+        )
+        
+        ascending = st.checkbox("Сортировать по возрастанию", value=True)
+        
+        # Sort and display
+        if sort_by in comparison_df.columns:
+            sorted_df = comparison_df.sort_values(by=sort_by, ascending=ascending)
+        else:
+            # Если выбранного столбца нет, не сортируем или используем первый доступный столбец
+            st.warning(f"Столбец '{sort_by}' не найден в данных. Отображение без сортировки.")
+            sorted_df = comparison_df
+        
+        st.dataframe(sorted_df)
+        
+        # Download button for the dataframe
+        csv = sorted_df.to_csv(index=False)
+        st.download_button(
+            label="Скачать метрики в CSV",
+            data=csv,
+            file_name="model_metrics.csv",
+            mime="text/csv"
+        )
+    else:
+        st.warning("Нет доступных метрик для сравнения моделей.")
+
+def display_model_architecture(all_histories):
+    """Display architecture visualization for selected model."""
+    st.markdown('<div class="sub-header">Model Architecture Visualization</div>', unsafe_allow_html=True)
+    
+    try:
+        logger.info("Отображение архитектуры модели")
+        
+        # Select group and model
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            selected_group = st.selectbox(
+                "Select Model Group:", 
+                options=list(all_histories.keys())
+            )
+        
+        with col2:
+            if selected_group:
+                selected_model = st.selectbox(
+                    "Select Model:",
+                    options=list(all_histories[selected_group].keys())
+                )
+            else:
+                selected_model = None
+        
+        if selected_group and selected_model:
+            logger.info(f"Выбрана модель: {selected_model} из группы {selected_group}")
+            
+            # Try to find the matching model file in the models directory
+            model_found = False
+            model_files = []
+            model_path = None
+            
+            # Different model naming patterns for different groups
+            group_path = MODELS_PATH / selected_group
+            
+            if os.path.exists(group_path):
+                logger.info(f"Поиск файла модели в директории: {group_path}")
+                # Get all model files in the group directory
+                model_files = [f for f in os.listdir(group_path) if f.endswith('.h5')]
+                logger.info(f"Найдено файлов моделей: {len(model_files)}")
+                
+                # Определяем шаблоны поиска файлов в зависимости от группы
+                if selected_group in ['1 old', '2 new']:
+                    # For groups 1 and 2, format is typically just "name.h5"
+                    if f"{selected_model}.h5" in model_files:
+                        model_path = group_path / f"{selected_model}.h5"
+                        model_found = True
+                        logger.info(f"Файл модели найден: {model_path}")
+                else:
+                    # For groups 3 and 4, format is typically "model_name_timestamp.h5"
+                    # First attempt: Direct match with model name
+                    if f"{selected_model}.h5" in model_files:
+                        model_path = group_path / f"{selected_model}.h5"
+                        model_found = True
+                        logger.info(f"Файл модели найден: {model_path}")
+                    # Second attempt: Model name with "model_" prefix
+                    elif f"model_{selected_model}.h5" in model_files:
+                        model_path = group_path / f"model_{selected_model}.h5"
+                        model_found = True
+                        logger.info(f"Файл модели найден: {model_path}")
+                    # If still not found, search for partial matches
+                    else:
+                        # Partial match based on model name components
+                        model_name_parts = selected_model.split('_')
+                        for model_file in model_files:
+                            if any(part in model_file for part in model_name_parts if len(part) > 2):
+                                model_path = group_path / model_file
+                                model_found = True
+                                logger.info(f"Найден подходящий файл модели: {model_path}")
+                                break
+                
+                if not model_found:
+                    logger.warning(f"Не удалось найти файл модели для '{selected_model}' в группе '{selected_group}'")
+                    st.warning(f"Не удалось найти файл модели для '{selected_model}' в группе '{selected_group}'")
+                    st.write("Доступные файлы моделей в этой группе:")
+                    st.write(", ".join(model_files) if model_files else "Нет файлов")
+            else:
+                logger.warning(f"Директория группы не найдена: {group_path}")
+                st.warning(f"Директория группы не найдена: {group_path}")
+            
+            # Display model info if found
+            if model_found and model_path:
+                try:
+                    logger.info(f"Попытка визуализации модели: {model_path}")
+                    # Try to load and visualize the model
+                    # Закомментируем вызов функции visualize_keras_model
+                    # visualize_keras_model(str(model_path))
+                    
+                    # Display model file location
+                    st.info(f"Model file: {model_path}")
+                    logger.info(f"Модель успешно визуализирована: {model_path}")
+                except Exception as e:
+                    log_error(e, section="визуализация модели", context=f"файл: {model_path}")
+            else:
+                st.warning(f"No matching model file found for {selected_model} in {selected_group}.")
+                
+                if model_files:
+                    st.info(f"Available model files in {selected_group}: {', '.join(model_files)}")
+                else:
+                    st.info(f"No model files found in {selected_group}.")
+        else:
+            st.info("Select a model group and model to visualize its architecture.")
+    except Exception as e:
+        log_error(e, section="display_model_architecture")
+
+def display_training_history(all_histories):
+    """Display training history for selected models."""
+    st.markdown('<div class="sub-header">История обучения</div>', unsafe_allow_html=True)
+    
+    # Allow selection of multiple models for comparison
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Select group
+        selected_group = st.selectbox(
+            "Выберите группу:",
+            options=list(all_histories.keys())
+        )
+    
+    with col2:
+        # Select metric
+        selected_metric = st.selectbox(
+            "Выберите метрику:",
+            options=STANDARD_METRICS,
+            format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
+        )
+    
+    fig = None
+    
+    if selected_group:
+        # Get models in the selected group
+        models = list(all_histories[selected_group].keys())
+        
+        # Filter out placeholder models
+        models = [model for model in models 
+                 if not (isinstance(all_histories[selected_group][model], dict) 
+                         and all_histories[selected_group][model].get('__placeholder__', False))]
+        
+        if models:
+            # Select models for comparison
+            selected_models = st.multiselect(
+                "Выберите модели для сравнения:",
+                options=models,
+                default=models[:min(3, len(models))]  # Default to first 3 models
+            )
+            
+            if selected_models:
+                # Create list of (group, model) tuples
+                model_tuples = [(selected_group, model) for model in selected_models]
+                
+                # Plot training progress
+                fig = plot_training_progress(all_histories, model_tuples, selected_metric)
+    
+    if fig:
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning(f"Нет данных истории обучения для выбранных моделей и метрики: {selected_metric}")
+    
+    # Show detailed metrics for each selected model if selected_models exists and is not empty
+    if selected_group and 'selected_models' in locals() and selected_models:
+        st.markdown('<div class="sub-header">Детали метрик модели</div>', unsafe_allow_html=True)
+        
+        for model in selected_models:
+            history = all_histories[selected_group][model]
+            
+            # Create expander for each model
+            with st.expander(f"Модель: {model}"):
+                # Check if history contains the 'history' key with metrics
+                if isinstance(history, dict) and 'history' in history and isinstance(history['history'], dict):
+                    # Display information about the model
+                    if 'model_name' in history:
+                        st.write(f"**Название модели:** {history['model_name']}")
+                    if 'group_name' in history:
+                        st.write(f"**Группа:** {history['group_name']}")
+                    
+                    # Display final metrics if available
+                    if 'metrics' in history and isinstance(history['metrics'], dict):
+                        st.write("**Итоговые метрики оценки:**")
+                        
+                        # Create two columns for metrics display
+                        col1, col2 = st.columns(2)
+                        
+                        # Исключаем mape, r2, norm_rmse, norm_mae и median_absolute_error из отображения
+                        metrics_to_exclude = ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']
+                        metrics = [m for m in sorted(history['metrics'].keys()) if m not in metrics_to_exclude]
+                        half = len(metrics) // 2
+                        
+                        # First column of metrics
+                        with col1:
+                            for metric in metrics[:half]:
+                                display_name = METRIC_DISPLAY_NAMES.get(metric, metric)
+                                value = history['metrics'][metric]
+                                st.metric(label=display_name, value=f"{value:.4f}")
+                        
+                        # Second column of metrics
+                        with col2:
+                            for metric in metrics[half:]:
+                                display_name = METRIC_DISPLAY_NAMES.get(metric, metric)
+                                value = history['metrics'][metric]
+                                st.metric(label=display_name, value=f"{value:.4f}")
+                    
+                    # Display training history for different metrics
+                    history_data = history['history']
+                    
+                    # Get available metrics
+                    available_metrics = [m for m in STANDARD_METRICS if m in history_data]
+                    
+                    if available_metrics:
+                        # Create tabs for different metric categories
+                        tab1, tab2 = st.tabs(["Метрики ошибок", "Метрики производительности"])
+                        
+                        # Error metrics tab
+                        with tab1:
+                            error_metrics = ['rmse', 'mse', 'mae', 'max_error']
+                            error_metrics = [m for m in error_metrics if m in available_metrics]
+                            
+                            if error_metrics:
+                                for metric in error_metrics:
+                                    # Safely check if metric has data and is not None
+                                    if metric in history_data and history_data[metric] is not None:
+                                        values = history_data[metric]
+                                        
+                                        # Ensure values is a list
+                                        if not isinstance(values, list):
+                                            # Для скалярного значения отображаем только конечное значение
+                                            st.metric(
+                                                label=f"Итоговое {METRIC_DISPLAY_NAMES.get(metric, metric)}", 
+                                                value=f"{values:.4f}"
+                                            )
+                                            continue
+                                        
+                                        if len(values) > 0:
+                                            epochs = list(range(1, len(values) + 1))
+                                            
+                                            fig = px.line(
+                                                x=epochs,
+                                                y=values,
+                                                title=f"История {METRIC_DISPLAY_NAMES.get(metric, metric)}",
+                                                labels={'x': 'Эпоха', 'y': metric}
+                                            )
+                                            st.plotly_chart(fig, use_container_width=True)
+                            else:
+                                st.info("Для этой модели нет доступных метрик ошибок.")
+                        
+                        # Performance metrics tab
+                        with tab2:
+                            perf_metrics = ['explained_variance']
+                            perf_metrics = [m for m in perf_metrics if m in available_metrics]
+                            
+                            if perf_metrics:
+                                for metric in perf_metrics:
+                                    # Safely check if metric has data and is not None
+                                    if metric in history_data and history_data[metric] is not None:
+                                        values = history_data[metric]
+                                        
+                                        # Ensure values is a list
+                                        if not isinstance(values, list):
+                                            # Для скалярного значения отображаем только конечное значение
+                                            st.metric(
+                                                label=f"Итоговое {METRIC_DISPLAY_NAMES.get(metric, metric)}", 
+                                                value=f"{values:.4f}"
+                                            )
+                                            continue
+                                        
+                                        if len(values) > 0:
+                                            epochs = list(range(1, len(values) + 1))
+                                            
+                                            fig = px.line(
+                                                x=epochs,
+                                                y=values,
+                                                title=f"История {METRIC_DISPLAY_NAMES.get(metric, metric)}",
+                                                labels={'x': 'Эпоха', 'y': metric}
+                                            )
+                                            st.plotly_chart(fig, use_container_width=True)
+                            else:
+                                st.info("Для этой модели нет доступных метрик производительности.")
+                    else:
+                        st.info("Для этой модели нет доступных метрик истории обучения.")
+                else:
+                    st.warning("Формат данных истории не соответствует ожидаемому.")
+        else:
+            st.warning(f"В группе '{selected_group}' не найдено действительных моделей.")
+    else:
+        st.info("Выберите группу моделей для просмотра истории обучения.")
+
+def display_model_comparison(all_histories, comparison_df):
+    """Display comparison of models across different metrics."""
+    st.markdown('<div class="sub-header">Сравнение моделей</div>', unsafe_allow_html=True)
+    
+    # Пересоздаем таблицу сравнения для свежих данных
+    try:
+        comparison_df = create_metrics_comparison(all_histories, metrics=STANDARD_METRICS)
+        logger.info(f"Обновлена таблица сравнения с {len(comparison_df)} моделями для страницы сравнения")
+    except Exception as e:
+        logger.error(f"Ошибка при обновлении таблицы сравнения: {e}")
+    
+    # Create tabs for different visualization types
+    tab1, tab2, tab3 = st.tabs(["Сравнение метрик", "Лепестковая диаграмма", "Сравнение групп"])
+    
+    with tab1:
+        # Select metric for comparison
+        selected_metric = st.selectbox(
+            "Выберите метрику для сравнения:",
+            options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+            format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
+        )
+        
+        # Create comparison chart
+        fig = plot_metric_comparison(comparison_df, selected_metric)
+        
+        if fig:
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Display explanation about the metric
+            metric_explanations = {
+                'rmse': "**Корень из среднеквадратичной ошибки (RMSE)** измеряет среднюю величину ошибок прогноза. Меньшие значения указывают на лучшую производительность модели.",
+                'explained_variance': "**Объяснённая дисперсия** измеряет долю дисперсии в зависимой переменной, которую можно предсказать на основе независимых переменных.",
+                'mae': "**Средняя абсолютная ошибка (MAE)** измеряет среднюю величину ошибок без учета их направления. Меньшие значения лучше.",
+                'max_error': "**Максимальная ошибка** показывает максимальную остаточную ошибку, представляющую наихудший случай прогноза. Меньше значение - лучше.",
+                'mse': "**Среднеквадратичная ошибка (MSE)** - это среднее значение квадратов разностей между предсказанными и фактическими значениями. Меньшие значения указывают на лучшее соответствие."
+            }
+            
+            if selected_metric in metric_explanations:
+                st.markdown(metric_explanations[selected_metric])
+        else:
+            st.warning(f"Нет данных для метрики: {selected_metric}")
+    
+    with tab2:
+        # Select metrics for radar chart
+        selected_metrics = st.multiselect(
+            "Выберите метрики для лепестковой диаграммы:",
+            options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+            default=[m for m in STANDARD_METRICS[:5] if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+            format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
+        )
+        
+        # Подготовим список моделей для выбора
+        all_models = []
+        for group in all_histories:
+            for model in all_histories[group]:
+                if not (isinstance(all_histories[group][model], dict) and 
+                   all_histories[group][model].get('__placeholder__', False)):
+                    all_models.append((group, model))
+        
+        # Формируем варианты для выбора
+        model_options = [f"{model} ({group})" for group, model in all_models]
+        default_selections = model_options[:min(3, len(model_options))] if model_options else []
+        
+        # Выбор моделей для сравнения
+        selected_models = st.multiselect(
+            "Выберите модели для включения (максимум 5):",
+            options=model_options,
+            default=default_selections
+        )
+        
+        # Limit to max 5 models for readability
+        if len(selected_models) > 5:
+            st.warning("Для лучшей читаемости на лепестковой диаграмме будут показаны только первые 5 выбранных моделей.")
+            selected_models = selected_models[:5]
+        
+        if selected_metrics and selected_models:
+            # Filter comparison_df to include only selected models
+            selected_model_tuples = []
+            for model_str in selected_models:
+                # Extract model and group from the combined string
+                model, group = model_str.split(" (")
+                group = group.rstrip(")")
+                selected_model_tuples.append((group, model))
+            
+            filtered_df = comparison_df[
+                comparison_df.apply(
+                    lambda row: (row['group'], row['model']) in [(group, model) for group, model in selected_model_tuples], 
+                    axis=1
+                )
+            ]
+            
+            if not filtered_df.empty and len(selected_metrics) > 0:
+                # Create radar chart
+                fig = create_radar_chart(filtered_df, metrics=selected_metrics)
+                
+                if fig:
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Add explanation about normalization
+                    st.markdown("""
+                    **Примечание о лепестковой диаграмме:**
+                    - Метрики нормализованы до шкалы 0-1, где 1 всегда представляет наилучшую производительность.
+                    - Для метрик ошибок (RMSE, MAE и т.д.), меньшие исходные значения лучше, поэтому шкала инвертируется.
+                    - Для метрик производительности (объяснённая дисперсия), большие значения лучше.
+                    """)
+                else:
+                    st.warning("Не удалось создать лепестковую диаграмму с выбранными данными.")
+            else:
+                st.warning("Нет данных для выбранных моделей и метрик.")
+        else:
+            st.info("Выберите хотя бы одну метрику и одну модель для создания лепестковой диаграммы.")
+    
+    with tab3:
+        # Group comparison
+        st.subheader("Сравнение групп моделей")
+        
+        # Calculate group averages
+        if 'group' in comparison_df.columns:
+            # Create group metrics for each standardized metric
+            group_metrics = []
+            
+            for group in comparison_df['group'].unique():
+                group_data = {'group': group}  # Use lowercase 'group' for consistency
+                
+                # Filter dataframe for this group
+                group_df = comparison_df[comparison_df['group'] == group]
+                
+                # Calculate average for each metric
+                for metric in STANDARD_METRICS:
+                    if metric in group_df.columns:
+                        group_data[f'avg_{metric}'] = group_df[metric].mean()
+                        group_data[f'best_{metric}'] = group_df[metric].min() if not HIGHER_IS_BETTER.get(metric, False) else group_df[metric].max()
+                
+                # Add count of models
+                group_data['model_count'] = len(group_df)
+                
+                group_metrics.append(group_data)
+            
+            # Create dataframe
+            if group_metrics:
+                group_df = pd.DataFrame(group_metrics)
+                
+                # Display model counts
+                st.write("**Количество моделей по группам:**")
+                
+                # Create bar chart for model counts
+                fig = px.bar(
+                    group_df,
+                    x='group',  # Use lowercase column name
+                    y='model_count',
+                    title='Модели по группам',
+                    labels={'model_count': 'Количество моделей', 'group': 'Группа'},
+                    color='group'  # Use lowercase column name
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Select metric for group comparison
+                selected_metric = st.selectbox(
+                    "Выберите метрику для сравнения групп:",
+                    options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+                    format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x),
+                    key="group_comparison_metric"
+                )
+                
+                if selected_metric:
+                    # Create tabs for different comparison types
+                    tab_avg, tab_best = st.tabs(["Средняя производительность", "Лучшая производительность"])
+                    
+                    with tab_avg:
+                        # Average performance
+                        avg_col = f'avg_{selected_metric}'
+                        
+                        if avg_col in group_df.columns:
+                            # Create bar chart
+                            fig = px.bar(
+                                group_df,
+                                x='group',  # Use lowercase column name
+                                y=avg_col,
+                                title=f'Среднее {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)} по группам',
+                                labels={avg_col: f'Среднее {selected_metric}', 'group': 'Группа'},
+                                color='group'  # Use lowercase column name
+                            )
+                            
+                            # Adjust y-axis (lower bound for better metrics)
+                            if not HIGHER_IS_BETTER.get(selected_metric, False):
+                                fig.update_layout(yaxis_range=[0, group_df[avg_col].max() * 1.1])
+                            
+                            st.plotly_chart(fig, use_container_width=True)
+                        else:
+                            st.warning(f"Нет данных для средней метрики: {selected_metric}")
+                    
+                    with tab_best:
+                        # Best performance
+                        best_col = f'best_{selected_metric}'
+                        
+                        if best_col in group_df.columns:
+                            # Create bar chart
+                            fig = px.bar(
+                                group_df,
+                                x='group',  # Use lowercase column name
+                                y=best_col,
+                                title=f'Лучшее {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)} по группам',
+                                labels={best_col: f'Лучшее {selected_metric}', 'group': 'Группа'},
+                                color='group'  # Use lowercase column name
+                            )
+                            
+                            # Adjust y-axis (lower bound for better metrics)
+                            if not HIGHER_IS_BETTER.get(selected_metric, False):
+                                fig.update_layout(yaxis_range=[0, group_df[best_col].max() * 1.1])
+                            
+                            st.plotly_chart(fig, use_container_width=True)
+                        else:
+                            st.warning(f"Нет данных для лучшей метрики: {selected_metric}")
+                
+                if not selected_metric:
+                    st.warning("Не выбрана метрика для сравнения групп.")
+                else:
+                    st.warning("Нет данных для сравнения групп.")
+            else:
+                st.warning("Информация о группах недоступна в данных метрик.")
+
+def display_best_models(all_histories):
+    """Display the best performing models based on different metrics."""
+    st.markdown('<div class="sub-header">Лучшие модели</div>', unsafe_allow_html=True)
+    
+    # Пересоздаем таблицу метрик для свежих данных
+    try:
+        # Создаем обновленную таблицу метрик для определения лучших моделей
+        updated_comparison_df = create_metrics_comparison(all_histories, metrics=STANDARD_METRICS)
+        logger.info(f"Обновлена таблица метрик с {len(updated_comparison_df)} моделями для страницы лучших моделей")
+    except Exception as e:
+        logger.error(f"Ошибка при обновлении таблицы метрик: {e}")
+    
+    # Select metric for determining best models
+    selected_metric = st.selectbox(
+        "Выберите метрику для ранжирования:",
+        options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+        format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
+    )
+    
+    # Determine if higher is better for this metric
+    is_higher_better = HIGHER_IS_BETTER.get(selected_metric, False)
+    
+    # Get best models based on the selected metric
+    best_models = get_best_models(all_histories, metric=selected_metric, is_higher_better=is_higher_better)
+    
+    if best_models:
+        # Create dataframe for best models
+        best_df = pd.DataFrame([
+            {
+                'group': group,
+                'model': info['model_name'],
+                selected_metric: info['value']
+            }
+            for group, info in best_models.items()
+        ])
+        
+        # Sort based on metric (ascending or descending based on is_higher_better)
+        best_df = best_df.sort_values(by=selected_metric, ascending=not is_higher_better)
+        
+        # Display as table
+        st.write(f"**Лучшие модели по {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)}:**")
+        st.dataframe(best_df)
+        
+        # Create bar chart
+        fig = px.bar(
+            best_df,
+            x='group',
+            y=selected_metric,
+            color='model',
+            title=f'Лучшие модели по {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)}',
+            barmode='group',
+            text='model'
+        )
+        
+        # Adjust label positions
+        fig.update_traces(textposition='outside')
+        
+        # Adjust y-axis (lower bound for better metrics)
+        if not is_higher_better:
+            fig.update_layout(yaxis_range=[0, best_df[selected_metric].max() * 1.1])
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Display information about each best model
+        st.markdown('<div class="sub-header">Подробная информация</div>', unsafe_allow_html=True)
+        
+        for group, info in best_models.items():
+            model_name = info['model_name']
+            
+            with st.expander(f"Лучшая модель в группе {group}: {model_name}"):
+                if group in all_histories and model_name in all_histories[group]:
+                    history = all_histories[group][model_name]
+                    
+                    # Check if history contains the necessary information
+                    if isinstance(history, dict):
+                        if 'model_name' in history:
+                            st.write(f"**Название модели:** {history['model_name']}")
+                        if 'group_name' in history:
+                            st.write(f"**Группа:** {history['group_name']}")
+                        
+                        # Display final metrics if available
+                        if 'metrics' in history and isinstance(history['metrics'], dict):
+                            st.write("**Итоговые метрики оценки:**")
+                            
+                            # Create two columns for metrics display
+                            col1, col2 = st.columns(2)
+                            
+                            # Исключаем mape, r2, norm_rmse, norm_mae и median_absolute_error из отображения
+                            metrics_to_exclude = ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']
+                            metrics = [m for m in sorted(history['metrics'].keys()) if m not in metrics_to_exclude]
+                            half = len(metrics) // 2
+                            
+                            # First column of metrics
+                            with col1:
+                                for metric in metrics[:half]:
+                                    display_name = METRIC_DISPLAY_NAMES.get(metric, metric)
+                                    value = history['metrics'][metric]
+                                    st.metric(label=display_name, value=f"{value:.4f}")
+                            
+                            # Second column of metrics
+                            with col2:
+                                for metric in metrics[half:]:
+                                    display_name = METRIC_DISPLAY_NAMES.get(metric, metric)
+                                    value = history['metrics'][metric]
+                                    st.metric(label=display_name, value=f"{value:.4f}")
+                        
+                        # Display training history for best metric
+                        if 'history' in history and isinstance(history['history'], dict):
+                            if selected_metric in history['history'] and history['history'][selected_metric] is not None:
+                                # Проверяем, является ли значение списком или скаляром
+                                metric_values = history['history'][selected_metric]
+                                if isinstance(metric_values, list) and len(metric_values) > 0:
+                                    # Для списка значений (история по эпохам)
+                                    st.write(f"**История обучения для {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)}:**")
+                                    epochs = list(range(1, len(metric_values) + 1))
+                                    
+                                    # Создаем график внутри блока, где определена переменная epochs
+                                    fig = px.line(
+                                        x=epochs,
+                                        y=metric_values,
+                                        title=f"История {METRIC_DISPLAY_NAMES.get(selected_metric, selected_metric)}",
+                                        labels={'x': 'Эпоха', 'y': selected_metric}
+                                    )
+                                    st.plotly_chart(fig, use_container_width=True)
+                                else:
+                                    st.warning("История метрики не содержит данных для построения графика.")
+                            else:
+                                st.warning("Данные истории модели не в ожидаемом формате.")
+                        else:
+                            st.warning(f"Информация о модели не найдена для {model_name} в группе {group}.")
+                    else:
+                        st.warning(f"Информация о модели не найдена для {model_name} в группе {group}.")
+                else:
+                    st.warning("Лучшие модели для выбранной метрики не найдены.")
+    else:
+        st.warning("Не удалось найти лучшие модели для выбранной метрики.")
+
+def get_model_group_names():
+    """
+    Получает список имен групп моделей из директории моделей.
+    
+    Returns:
+        list: Список имен групп моделей
+    """
+    try:
+        if not os.path.exists(MODELS_PATH):
+            logging.warning(f"Директория моделей не найдена: {MODELS_PATH}")
+            return []
+        
+        group_dirs = [d for d in os.listdir(MODELS_PATH) 
+                    if os.path.isdir(os.path.join(MODELS_PATH, d))]
+        
+        logging.info(f"Найдено {len(group_dirs)} групп моделей: {', '.join(group_dirs)}")
+        return sorted(group_dirs)
+    except Exception as e:
+        logging.error(f"Ошибка при получении групп моделей: {str(e)}")
+        return []
+
+def get_model_paths(group_name):
+    """
+    Получает пути к моделям для указанной группы.
+    
+    Args:
+        group_name (str): Имя группы моделей
+        
+    Returns:
+        list: Список путей к файлам моделей
+    """
+    try:
+        group_path = os.path.join(MODELS_PATH, group_name)
+        
+        if not os.path.exists(group_path):
+            logging.warning(f"Директория группы не найдена: {group_path}")
+            return []
+        
+        model_files = [os.path.join(group_path, f) for f in os.listdir(group_path) 
+                     if f.endswith('.h5') and os.path.isfile(os.path.join(group_path, f))]
+        
+        logging.info(f"Найдено {len(model_files)} моделей в группе {group_name}")
+        return model_files
+    except Exception as e:
+        logging.error(f"Ошибка при получении путей к моделям для группы {group_name}: {str(e)}")
+        return []
+
+def display_model_structure(all_histories):
+    """
+    Отображает структуру выбранной модели, включая архитектуру, сводку и информацию о слоях.
+    
+    Args:
+        all_histories (dict): Словарь с историями обучения всех моделей
+    """
+    try:
+        st.header("Структура модели")
+        
+        # Выбор группы моделей
+        group_names = get_model_group_names()
+        if not group_names:
+            st.warning("Не найдено ни одной группы моделей.")
+            return
+            
+        selected_group = st.selectbox("Выберите группу моделей", group_names)
+        
+        # Получаем пути к моделям выбранной группы
+        model_paths = get_model_paths(selected_group)
+        if not model_paths:
+            st.warning(f"Не найдено ни одной модели в группе {selected_group}")
+            return
+            
+        model_filenames = [os.path.basename(path) for path in model_paths]
+        selected_model_filename = st.selectbox("Выберите модель", model_filenames)
+        
+        # Полный путь к выбранной модели
+        selected_model_path = os.path.join(MODELS_PATH, selected_group, selected_model_filename)
+        
+        if not os.path.exists(selected_model_path):
+            st.error(f"Файл модели не найден: {selected_model_path}")
+            return
+        
+        # Загружаем модель
+        try:
+            model = tf.keras.models.load_model(selected_model_path)
+            logger.info(f"Модель загружена: {selected_model_path}")
+        except Exception as e:
+            st.error(f"Не удалось загрузить модель: {str(e)}")
+            logger.error(f"Ошибка при загрузке модели {selected_model_path}: {str(e)}")
+            return
+
+        # Создаем вкладки для разных видов визуализации
+        arch_tab, structure_tab, summary_tab, layers_tab = st.tabs(["Архитектура", "Структура", "Сводка", "Информация о слоях"])
+        
+        with arch_tab:
+            # Создаем временный файл для сохранения изображения
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+                temp_filepath = temp_file.name
+            
+            try:
+                # Создаем и сохраняем изображение архитектуры
+                # Закомментируем вызов функции visualize_keras_model
+                # visualize_keras_model(str(model_path))
+                
+                # Отображаем изображение
+                image = Image.open(temp_filepath)
+                st.image(image, use_column_width=True, caption=f"Архитектура модели: {selected_model_filename}")
+                
+                # Добавляем кнопку для скачивания изображения
+                with open(temp_filepath, "rb") as file:
+                    btn = st.download_button(
+                        label="Скачать архитектуру в PNG",
+                        data=file,
+                        file_name=f"{selected_model_filename}_architecture.png",
+                        mime="image/png"
+                    )
+                logger.info(f"Сгенерировано изображение архитектуры для модели {selected_model_filename}")
+            except Exception as e:
+                st.error(f"Не удалось создать визуализацию архитектуры: {str(e)}")
+                logger.error(f"Ошибка при визуализации архитектуры модели {selected_model_filename}: {str(e)}")
+            finally:
+                # Удаляем временный файл
+                if os.path.exists(temp_filepath):
+                    os.unlink(temp_filepath)
+                    
+        with structure_tab:
+            try:
+                # Выбор стиля визуализации
+                viz_style = st.radio(
+                    "Стиль визуализации структуры:",
+                    ["Стандартный вид", "Таблицы входов/выходов"],
+                    horizontal=True
+                )
+                
+                if viz_style == "Стандартный вид":
+                    # Используем существующую функцию
+                    arch_fig = model_architecture.plot_model_architecture(model)
+                    st.plotly_chart(arch_fig, use_container_width=True)
+                else:
+                    # Используем новую функцию для визуализации с таблицами
+                    structure_fig = model_architecture.plot_model_structure_diagram(model)
+                    st.plotly_chart(structure_fig, use_container_width=True)
+                
+                logger.info(f"Сгенерирована визуализация структуры для модели {selected_model_filename}")
+            except Exception as e:
+                st.error(f"Не удалось создать визуализацию структуры: {str(e)}")
+                logger.error(f"Ошибка при визуализации структуры модели {selected_model_filename}: {str(e)}")
+        
+        with summary_tab:
+            # Получаем сводку модели в виде строки
+            string_io = io.StringIO()
+            model.summary(print_fn=lambda x: string_io.write(x + '\n'))
+            model_summary = string_io.getvalue()
+            
+            # Отображаем сводку модели
+            st.text(model_summary)
+            
+            # Добавляем кнопку для скачивания сводки
+            st.download_button(
+                label="Скачать сводку в TXT",
+                data=model_summary,
+                file_name=f"{selected_model_filename}_summary.txt",
+                mime="text/plain"
+            )
+            logger.info(f"Сгенерирована сводка для модели {selected_model_filename}")
+        
+        with layers_tab:
+            # Создаем DataFrame с информацией о слоях
+            layers_data = []
+            
+            for i, layer in enumerate(model.layers):
+                layer_info = {
+                    "№": i + 1,
+                    "Название слоя": layer.name,
+                    "Тип слоя": layer.__class__.__name__,
+                    "Параметры": layer.count_params(),
+                }
+                
+                # Получаем информацию о форме входных и выходных данных
+                # Более надежный способ получения shape для всех типов слоев
+                try:
+                    input_shape = layer.input_shape
+                    if isinstance(input_shape, list):
+                        input_shape_str = ", ".join([str(s) for s in input_shape])
+                    else:
+                        input_shape_str = str(input_shape)
+                    layer_info["Форма входных данных"] = input_shape_str
+                except (AttributeError, ValueError):
+                    layer_info["Форма входных данных"] = "Недоступно"
+                
+                try:
+                    output_shape = layer.output_shape
+                    if isinstance(output_shape, list):
+                        output_shape_str = ", ".join([str(s) for s in output_shape])
+                    else:
+                        output_shape_str = str(output_shape)
+                    layer_info["Форма выходных данных"] = output_shape_str
+                except (AttributeError, ValueError):
+                    layer_info["Форма выходных данных"] = "Недоступно"
+                
+                # Получаем конфигурацию слоя
+                try:
+                    config = layer.get_config()
+                    config_str = ", ".join([f"{k}: {v}" for k, v in config.items() 
+                                           if k not in ["name", "trainable"] and str(v).strip()])
+                    layer_info["Конфигурация"] = config_str
+                except:
+                    layer_info["Конфигурация"] = "Недоступно"
+                
+                layers_data.append(layer_info)
+            
+            # Создаем DataFrame и отображаем его
+            layers_df = pd.DataFrame(layers_data)
+            st.dataframe(layers_df, use_container_width=True)
+            
+            # Добавляем кнопку для скачивания данных о слоях
+            csv = layers_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="Скачать информацию о слоях в CSV",
+                data=csv,
+                file_name=f"{selected_model_filename}_layers.csv",
+                mime="text/csv"
+            )
+            logger.info(f"Сгенерирована информация о слоях для модели {selected_model_filename}")
+            
+    except Exception as e:
+        st.error(f"Произошла ошибка при отображении структуры модели: {str(e)}")
+        logger.error(f"Ошибка в display_model_structure: {str(e)}")
+        traceback.print_exc()
+
+def create_dashboard_pages():
+    """Создает страницы дашборда"""
+    st.set_page_config(
+        page_title="Анализ данных и моделей для прогнозирования радона",
+        page_icon="📊",
+        layout="wide"
+    )
+    
+    # Создаем боковую панель для навигации
+    selected_page = st.sidebar.radio(
+        "Выберите раздел:",
+        ["📈 Анализ данных", "🔍 Сравнение моделей", "📋 Исходные данные"]
+    )
+    
+    # Отображаем выбранную страницу
+    if selected_page == "📈 Анализ данных":
+        display_data_analysis_page()
+    elif selected_page == "🔍 Сравнение моделей":
+        display_model_comparison_page()
+    elif selected_page == "📋 Исходные данные":
+        display_raw_data_page()
+
+def display_data_analysis_page():
+    """Отображает страницу анализа данных"""
+    st.title("Анализ данных")
+    
+    # Информационный блок
+    st.info(
+        "Эта страница позволяет провести разведочный анализ данных о концентрации радона. "
+        "Вы можете загрузить свой файл данных или использовать демонстрационный набор."
+    )
+    
+    # Загрузка данных
+    uploaded_file = st.file_uploader("Загрузите файл данных (CSV)", type="csv")
+    
+    # Используем загруженный файл или демо-данные
+    if uploaded_file is not None:
+        df = load_data(uploaded_file)
+        st.success("Файл успешно загружен")
+    else:
+        # Проверяем наличие демо-данных
+        if os.path.exists(DEFAULT_DATA_PATH):
+            df = load_data(DEFAULT_DATA_PATH)
+            st.info(f"Используются демонстрационные данные из {DEFAULT_DATA_PATH}")
+        else:
+            st.warning(f"Демонстрационные данные не найдены по пути {DEFAULT_DATA_PATH}")
+            st.stop()
+    
+    # Отображаем предварительный просмотр данных
+    st.subheader("Предварительный просмотр данных")
+    preview_data = create_data_preview(df)
+    st.write(preview_data)
+    
+    # Создаем вкладки для разных видов анализа
+    tabs = st.tabs(["Распределения", "Корреляции", "Временной ряд"])
+    
+    # Вкладка 1: Распределения
+    with tabs[0]:
+        st.subheader("Распределение значений")
+        
+        # Выбор переменных для анализа
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        selected_vars = st.multiselect(
+            "Выберите переменные для анализа распределений:",
+            options=numeric_cols,
+            default=numeric_cols[:min(3, len(numeric_cols))]
+        )
+        
+        if selected_vars:
+            dist_figs = create_distribution_plots(df, selected_vars)
+            for fig in dist_figs:
+                st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.warning("Выберите хотя бы одну переменную для анализа")
+    
+    # Вкладка 2: Корреляции
+    with tabs[1]:
+        st.subheader("Анализ корреляций")
+        
+        # Создаем тепловую карту корреляций
+        corr_fig = create_correlation_heatmap(df)
+        st.plotly_chart(corr_fig, use_container_width=True)
+        
+        # Добавляем пояснение по интерпретации
+        st.markdown("""
+        **Интерпретация корреляций:**
+        - Значения близкие к 1: сильная положительная корреляция (переменные растут вместе)
+        - Значения близкие к -1: сильная отрицательная корреляция (когда одна растет, другая уменьшается)
+        - Значения близкие к 0: корреляция отсутствует (переменные не связаны линейно)
+        """)
+    
+    # Вкладка 3: Временной ряд
+    with tabs[2]:
+        st.subheader("Анализ временного ряда")
+        
+        # Проверяем, есть ли временная колонка
+        date_cols = [col for col in df.columns if 'date' in col.lower() or 'time' in col.lower()]
+        
+        if date_cols:
+            # Выбор временной колонки
+            time_col = st.selectbox("Выберите колонку с датой/временем:", date_cols)
+            
+            # Выбор переменных для анализа
+            target_vars = st.multiselect(
+                "Выберите переменные для анализа во времени:",
+                options=[col for col in numeric_cols if col != time_col],
+                default=[numeric_cols[0]] if len(numeric_cols) > 0 else []
+            )
+            
+            if target_vars:
+                # Создаем графики временных рядов
+                time_figs = create_timeseries_analysis(df, time_col, target_vars)
+                for fig in time_figs:
+                    st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.warning("Выберите хотя бы одну переменную для анализа")
+        else:
+            st.warning("В данных не обнаружены колонки с датой/временем")
+
+def display_model_comparison_page():
+    """Отображает страницу сравнения моделей"""
+    st.title("Сравнение моделей")
+    
+    # Информационный блок
+    st.info(
+        "Эта страница позволяет сравнить результаты работы различных моделей прогнозирования радона. "
+        "Вы можете загрузить файлы с результатами или использовать предустановленные примеры."
+    )
+    
+    # Загрузка файлов с результатами моделей
+    uploaded_files = st.file_uploader(
+        "Загрузите файлы с результатами моделей (CSV)", 
+        type="csv", 
+        accept_multiple_files=True
+    )
+    
+    # Поиск предустановленных результатов моделей
+    preset_dir = "model_save_preset"
+    preset_files = []
+    
+    if os.path.exists(preset_dir):
+        preset_files = glob.glob(os.path.join(preset_dir, "*_results.csv"))
+    
+    # Выбор между загруженными и предустановленными файлами
+    if uploaded_files:
+        use_preset = False
+        files_to_use = uploaded_files
+        st.success(f"Загружено файлов: {len(files_to_use)}")
+    elif preset_files:
+        use_preset = True
+        files_to_use = preset_files
+        st.info(f"Найдено предустановленных файлов с результатами: {len(files_to_use)}")
+        
+        # Отображаем список найденных файлов
+        with st.expander("Найденные файлы с результатами моделей:"):
+            for file in files_to_use:
+                if use_preset:
+                    st.write(f"- {os.path.basename(file)}")
+                else:
+                    st.write(f"- {file.name}")
+    else:
+        st.warning("Не найдены файлы с результатами моделей")
+        st.stop()
+    
+    # Парсим результаты моделей
+    models_data = []
+    
+    for file in files_to_use:
+        try:
+            if use_preset:
+                model_data = parse_model_results(file)
+                if model_data:
+                    models_data.append(model_data)
+                    
+                    # Дополнительно проверяем наличие файла модели
+                    model_path = file.replace("_results.csv", ".h5")
+                    if os.path.exists(model_path):
+                        # Отмечаем, что модель доступна
+                        models_data[-1]["model_path"] = model_path
+                
+            else:
+                # Для загруженных файлов
+                model_name = file.name.replace("_results.csv", "")
+                model_data = parse_model_results(file)
+                if model_data:
+                    models_data.append(model_data)
+        except Exception as e:
+            st.error(f"Ошибка при обработке файла {file if use_preset else file.name}: {e}")
+            logging.error(f"Ошибка при обработке файла {file if use_preset else file.name}: {e}")
+    
+    if not models_data:
+        st.error("Не удалось обработать ни один файл с результатами")
+        st.stop()
+    
+    # Создаем сравнение моделей
+    st.subheader("Сравнение метрик моделей")
+    fig_comparison = create_model_comparison(models_data)
+    st.plotly_chart(fig_comparison, use_container_width=True)
+    
+    # Создаем радар-чарт для сравнения моделей
+    st.subheader("Многомерное сравнение моделей")
+    fig_radar = create_radar_chart(models_data)
+    st.plotly_chart(fig_radar, use_container_width=True)
+    
+    # Добавляем детальную информацию по каждой модели
+    st.subheader("Детальная информация по моделям")
+    
+    for model_data in models_data:
+        with st.expander(f"Модель: {model_data['name']}"):
+            # Метрики
+            st.write("**Метрики:**")
+            metrics_df = pd.DataFrame({
+                "Метрика": list(model_data["metrics"].keys()),
+                "Значение": list(model_data["metrics"].values())
+            })
+            st.dataframe(metrics_df)
+            
+            # Важность признаков, если есть
+            if "feature_importance" in model_data and model_data["feature_importance"]:
+                st.write("**Важность признаков:**")
+                fi_fig = create_feature_importance_plot(model_data)
+                st.plotly_chart(fi_fig, use_container_width=True)
+            
+            # График обучения, если есть
+            if "training_history" in model_data and model_data["training_history"]:
+                st.write("**История обучения:**")
+                history_fig = plot_training_progress(model_data["training_history"])
+                st.plotly_chart(history_fig, use_container_width=True)
+            
+            # Проверка наличия файла модели для визуализации
+            if "model_path" in model_data and os.path.exists(model_data["model_path"]):
+                # Информация о файле модели
+                model_path = model_data["model_path"]
+                model_size = os.path.getsize(model_path) / (1024 * 1024)  # в МБ
+                
+                st.write(f"**Файл модели:** {os.path.basename(model_path)} ({model_size:.2f} МБ)")
+                
+                # Прогнозы и визуализация, если есть
+                if "predictions" in model_data and "actual" in model_data:
+                    st.write("**Сравнение прогнозов с фактическими значениями:**")
+                    pred_figs = create_prediction_plots(model_data)
+                    for fig in pred_figs:
+                        st.plotly_chart(fig, use_container_width=True)
+
+def display_raw_data_page():
+    """Отображает страницу с исходными данными"""
+    st.title("Исходные данные")
+    
+    # Информационный блок
+    st.info(
+        "Эта страница позволяет просмотреть и исследовать загруженные данные. "
+        "Вы можете загрузить новый файл данных или использовать демонстрационный набор."
+    )
+    
+    # Загрузка данных
+    uploaded_file = st.file_uploader("Загрузите файл данных (CSV)", type="csv")
+    
+    # Используем загруженный файл или демо-данные
+    if uploaded_file is not None:
+        df = load_data(uploaded_file)
+        data_source = "загруженного файла"
+    else:
+        # Проверяем наличие демо-данных
+        if os.path.exists(DEFAULT_DATA_PATH):
+            df = load_data(DEFAULT_DATA_PATH)
+            data_source = f"демонстрационных данных ({DEFAULT_DATA_PATH})"
+        else:
+            st.warning(f"Демонстрационные данные не найдены по пути {DEFAULT_DATA_PATH}")
+            st.stop()
+    
+    # Отображаем данные
+    st.subheader(f"Данные из {data_source}")
+    
+    # Создаем табы для разных представлений данных
+    tabs = st.tabs(["Таблица", "Сводная статистика", "Описание данных"])
+    
+    # Вкладка 1: Таблица данных
+    with tabs[0]:
+        # Добавляем фильтры для столбцов
+        all_columns = df.columns.tolist()
+        selected_columns = st.multiselect(
+            "Выберите столбцы для отображения:", 
+            options=all_columns,
+            default=all_columns
+        )
+        
+        if selected_columns:
+            # Отображаем выбранные столбцы
+            filtered_df = df[selected_columns]
+            st.dataframe(filtered_df, use_container_width=True)
+            
+            # Добавляем кнопку скачивания
+            csv = filtered_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="Скачать данные как CSV",
+                data=csv,
+                file_name="filtered_data.csv",
+                mime="text/csv",
+            )
+        else:
+            st.warning("Выберите хотя бы один столбец для отображения")
+    
+    # Вкладка 2: Сводная статистика
+    with tabs[1]:
+        st.write("**Сводная статистика:**")
+        
+        # Вычисляем статистики только для числовых столбцов
+        numeric_df = df.select_dtypes(include=[np.number])
+        if not numeric_df.empty:
+            stats_df = numeric_df.describe().T
+            
+            # Добавляем дополнительные статистики
+            stats_df['missing'] = df.isnull().sum()
+            stats_df['missing_pct'] = (df.isnull().sum() / len(df) * 100).round(2)
+            
+            # Отображаем результаты
+            st.dataframe(stats_df, use_container_width=True)
+        else:
+            st.warning("В данных не найдены числовые столбцы для расчета статистик")
+    
+    # Вкладка 3: Описание данных
+    with tabs[2]:
+        st.write("**Общая информация о данных:**")
+        
+        # Создаем и отображаем таблицу с типами данных и примерами
+        info_dict = {
+            "Столбец": [],
+            "Тип данных": [],
+            "Пример значения": [],
+            "Количество уникальных значений": [],
+            "Процент пропусков": []
+        }
+        
+        for col in df.columns:
+            info_dict["Столбец"].append(col)
+            info_dict["Тип данных"].append(str(df[col].dtype))
+            
+            # Пример значения (не NaN)
+            non_nan_values = df[col].dropna()
+            example = "N/A" if non_nan_values.empty else non_nan_values.iloc[0]
+            if isinstance(example, (float, int)) and not pd.isna(example):
+                example = round(example, 4)
+            info_dict["Пример значения"].append(str(example))
+            
+            # Уникальные значения
+            n_unique = df[col].nunique()
+            info_dict["Количество уникальных значений"].append(n_unique)
+            
+            # Процент пропусков
+            missing_pct = (df[col].isnull().sum() / len(df) * 100).round(2)
+            info_dict["Процент пропусков"].append(f"{missing_pct}%")
+        
+        # Создаем датафрейм с информацией
+        info_df = pd.DataFrame(info_dict)
+        st.dataframe(info_df, use_container_width=True)
+        
+        # Добавляем общую информацию о датасете
+        st.write(f"**Размер датасета:** {df.shape[0]} строк, {df.shape[1]} столбцов")
+        
+        # Пропущенные значения
+        missing_cols = df.columns[df.isnull().any()].tolist()
+        if missing_cols:
+            st.write(f"**Столбцы с пропущенными значениями ({len(missing_cols)}):** {', '.join(missing_cols)}")
+        else:
+            st.write("**Пропущенные значения:** отсутствуют")
+
+# Запуск дашборда
+if __name__ == "__main__":
+    try:
+        create_dashboard_pages()
+        logger.info("Дашборд успешно запущен")
+    except Exception as e:
+        st.error(f"Произошла ошибка при запуске дашборда: {e}")
+        logging.error(f"Ошибка при запуске дашборда: {e}") 

@@ -13,7 +13,8 @@ from model_evaluator import (
     load_models_from_directory,
     evaluate_models,
     save_evaluation_results,
-    plot_prediction_comparison
+    plot_prediction_comparison,
+    save_metrics_to_json
 )
 
 def main():
@@ -24,11 +25,13 @@ def main():
     parser.add_argument('--plots-dir', type=str, default='metric_standart/plots', help='Directory to save plots')
     parser.add_argument('--time-step', type=int, default=5, help='Time step for sequence data')
     parser.add_argument('--plot-samples', type=int, default=100, help='Number of samples to plot for predictions')
+    parser.add_argument('--metrics-dir', type=str, default='model_save_preset/history', help='Directory to save metric JSON files')
     args = parser.parse_args()
     
     # Ensure output directories exist
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     os.makedirs(args.plots_dir, exist_ok=True)
+    os.makedirs(args.metrics_dir, exist_ok=True)
     
     print(f"Loading and preparing data from {args.data}...")
     try:
@@ -49,6 +52,9 @@ def main():
     
     print(f"Saving evaluation results to {args.output}...")
     save_evaluation_results(results, args.output)
+    
+    print(f"Saving metrics as JSON files in {args.metrics_dir}...")
+    save_metrics_to_json(results, args.metrics_dir)
     
     print("Generating prediction plots...")
     for group_name, group_models in models.items():

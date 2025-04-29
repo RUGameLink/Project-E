@@ -361,82 +361,131 @@ def load_models_from_directory(base_dir: str) -> Dict[str, Dict[str, Any]]:
 def evaluate_models(models: Dict[str, Dict[str, Any]], 
                  data: Dict[str, np.ndarray]) -> Dict[str, Dict[str, Dict[str, float]]]:
     """
-    Evaluate multiple models using various metrics.
+    Evaluate loaded models with various metrics.
     
     Args:
-        models: Dictionary of models organized by group and model name.
-        data: Dictionary with data (X_train, y_train, X_test, y_test).
+        models: Dictionary with loaded models organized by group and model name.
+        data: Dictionary containing prepared data.
         
     Returns:
-        Dictionary with evaluation results organized by group, model name and metrics.
+        Dictionary with evaluation metrics for each model.
     """
     results = {}
     evaluation_errors = {}
     
-    # Получаем тестовые данные
+    # Get data
     X_test = data['X_test']
     y_test = data['y_test']
+    scaler = data['scaler']
+    test_scaled = data['test_scaled']
+    time_step = data['time_step']
     
-    # Нормализуем для некоторых метрик
-    scaler = MinMaxScaler()
-    y_test_scaled = scaler.fit_transform(y_test.reshape(-1, 1)).reshape(-1)
+    print(f"Input shape for evaluation: {X_test.shape}")
     
-    print("\nОценка моделей с помощью разных метрик:")
+    # Create tensors with different feature counts for model compatibility
+    X_test_2_features = X_test.copy()
+    if X_test.shape[-1] > 2:
+        # If we have more than 2 features, keep only the first 2
+        X_test_2_features = X_test[:, :, :2]
+        print(f"Created alternative input with 2 features: {X_test_2_features.shape}")
+        
+    # Create input with adjusted time steps for ensemble model (10 time steps instead of 5)
+    X_test_10_timesteps = None
+    if X_test.shape[1] < 10 and time_step < 10:
+        # Create a padded version by repeating the first time step
+        X_test_10_timesteps = np.zeros((X_test.shape[0], 10, X_test.shape[2]))
+        # Fill with actual data as much as possible
+        X_test_10_timesteps[:, 10-X_test.shape[1]:, :] = X_test
+        # Fill beginning with first value (padding)
+        for i in range(10-X_test.shape[1]):
+            X_test_10_timesteps[:, i, :] = X_test[:, 0, :]
+        print(f"Created version with 10 time steps: {X_test_10_timesteps.shape}")
+        
+        # Create a 10-timestep version with 2 features
+        if X_test.shape[-1] > 2:
+            X_test_10_timesteps_2_features = X_test_10_timesteps[:, :, :2]
+            print(f"Created 10-timestep version with 2 features: {X_test_10_timesteps_2_features.shape}")
     
-    # Оцениваем модели по группам
+    # Process each group
     for group_name, group_models in models.items():
+        print(f"\nГруппа: {group_name}")
+        
         results[group_name] = {}
         evaluation_errors[group_name] = {}
         
-        print(f"\nГруппа: {group_name}")
-        
-        # Оцениваем каждую модель
-        for model_name, model_data in group_models.items():
+        # Process each model in the group
+        for model_name, model_info in group_models.items():
             print(f"  Оценка модели: {model_name}")
             
+            model = model_info['model']
+            
             try:
-                # Получаем модель
-                model = model_data['model']
+                # Get model input shape requirements
+                input_shape = model.input_shape
+                current_X_test = X_test
                 
-                # Генерируем предсказания
-                y_pred = model.predict(X_test).flatten()
+                # Special handling for ensemble models that expect different input shapes
+                if 'ensemble' in model_name.lower():
+                    # Check expected input shape from model
+                    if input_shape and len(input_shape) >= 3:
+                        expected_timesteps = input_shape[1]
+                        expected_features = input_shape[2]
+                        
+                        # Use appropriate input based on requirements
+                        if expected_timesteps == 10 and expected_features == 2:
+                            if X_test_10_timesteps is not None:
+                                if X_test.shape[-1] > 2:
+                                    current_X_test = X_test_10_timesteps[:, :, :2]
+                                else:
+                                    current_X_test = X_test_10_timesteps
+                                print(f"    Using 10-timestep input for ensemble model {model_name}")
+                            else:
+                                raise ValueError(f"Model {model_name} requires 10 timesteps but cannot create compatible input")
                 
-                # Применяем тот же скейлинг для предсказаний
-                y_pred_scaled = scaler.transform(y_pred.reshape(-1, 1)).reshape(-1)
+                # For non-ensemble models, check normal feature compatibility
+                elif input_shape and len(input_shape) >= 3:
+                    expected_features = input_shape[-1]
+                    if expected_features == 2 and X_test.shape[-1] != 2:
+                        # Model expects 2 features but we have more
+                        current_X_test = X_test_2_features
+                        print(f"    Using 2-feature input for model {model_name}")
                 
-                # Рассчитываем различные метрики
+                # Make predictions
+                y_pred = model.predict(current_X_test, verbose=0)
+                
+                # If the output is multi-dimensional (e.g., for some advanced architectures),
+                # take only the first column
+                if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
+                    y_pred = y_pred[:, 0]
+                
+                # Calculate metrics
                 metrics = {
-                    'mae': mean_absolute_error(y_test, y_pred),
                     'mse': mean_squared_error(y_test, y_pred),
+                    'mae': mean_absolute_error(y_test, y_pred),
                     'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
-                    'mape': mean_absolute_percentage_error(y_test, y_pred) * 100,  # в процентах
-                    'r2_score': r2_score(y_test, y_pred),
-                    'explained_variance': explained_variance_score(y_test, y_pred),
+                    'r2': r2_score(y_test, y_pred),
+                    'explained_var': explained_variance_score(y_test, y_pred),
                     'max_error': max_error(y_test, y_pred),
-                    'median_absolute_error': median_absolute_error(y_test, y_pred)
+                    'median_abs_error': median_absolute_error(y_test, y_pred)
                 }
                 
-                # Добавляем нормализованные метрики для сравнения разных моделей
-                metrics.update({
-                    'norm_mae': mean_absolute_error(y_test_scaled, y_pred_scaled),
-                    'norm_rmse': np.sqrt(mean_squared_error(y_test_scaled, y_pred_scaled)),
-                })
+                # Try to calculate MAPE only if there are no zeros in y_test
+                if not np.any(y_test == 0):
+                    metrics['mape'] = mean_absolute_percentage_error(y_test, y_pred)
+                else:
+                    metrics['mape'] = np.nan
+                    print("    ⚠ Warning: MAPE calculation skipped due to zero values in test data")
                 
-                # Сохраняем метрики для этой модели
+                # Store results
                 results[group_name][model_name] = metrics
                 
-                # Выводим основные метрики
-                print(f"    MAE: {metrics['mae']:.4f}")
-                print(f"    RMSE: {metrics['rmse']:.4f}")
-                print(f"    R²: {metrics['r2_score']:.4f}")
+                # Print some metrics
+                print(f"    ✓ MSE: {metrics['mse']:.6f}, MAE: {metrics['mae']:.6f}, R²: {metrics['r2']:.6f}")
                 
             except Exception as e:
-                error_msg = f"Ошибка при оценке модели {model_name}: {str(e)}"
-                print(f"    ✗ {error_msg}")
-                evaluation_errors[group_name][model_name] = error_msg
-                
-                # Создаем пустой словарь метрик, чтобы не ломать последующую обработку
-                results[group_name][model_name] = {}
+                error_message = f"Ошибка при оценке модели {model_name}: {str(e)}"
+                print(f"    ✗ {error_message}")
+                evaluation_errors[group_name][model_name] = error_message
     
     # Итоговая статистика оценки
     total_models = sum(len(group_models) for group_models in models.values())
@@ -558,16 +607,16 @@ def plot_prediction_comparison(models: Dict[str, Dict[str, Any]], data: Dict[str
     
     print(f"Prediction comparison plot saved to {plot_path}")
 
-def save_metrics_to_pkl(results: Dict[str, Dict[str, Dict[str, float]]], base_dir: str = 'model_save_preset/history') -> None:
+def save_metrics_to_json(results: Dict[str, Dict[str, Dict[str, float]]], base_dir: str = 'model_save_preset/history') -> None:
     """
-    Save evaluation metrics to pickle (.pkl) files organized in the same structure as models.
+    Save evaluation metrics to JSON files organized in the same structure as models.
     
     Args:
         results: Dictionary with evaluation metrics.
-        base_dir: Base directory for saving pickle files.
+        base_dir: Base directory for saving JSON files.
     """
     if not results:
-        print(f"Предупреждение: Нет результатов для сохранения в .pkl файлы")
+        print(f"Предупреждение: Нет результатов для сохранения в .json файлы")
         return
     
     # Ensure base directory exists
@@ -599,35 +648,35 @@ def save_metrics_to_pkl(results: Dict[str, Dict[str, Dict[str, float]]], base_di
                 print(f"Пропуск модели {model_name} в группе {group_name} - нет метрик")
                 continue
                 
-            # Создаем объект истории, аналогичный Keras history
+            # Создаем объект истории, аналогичный Keras history, но с сериализуемыми значениями
             history_obj = {
-                'history': metrics,
+                'history': {k: float(v) if isinstance(v, np.number) else v for k, v in metrics.items()},
                 'params': {},
                 'epoch': [],
                 'model_name': model_name,
                 'group_name': group_name
             }
             
-            # Путь для сохранения .pkl файла
-            pkl_path = os.path.join(group_dir, f"{model_name}.pkl")
+            # Путь для сохранения .json файла
+            json_path = os.path.join(group_dir, f"{model_name}.json")
             try:
                 # Создаем родительские директории для файла, если они не существуют
-                os.makedirs(os.path.dirname(pkl_path), exist_ok=True)
+                os.makedirs(os.path.dirname(json_path), exist_ok=True)
                 
                 # Сохраняем файл
-                with open(pkl_path, 'wb') as f:
-                    pickle.dump(history_obj, f)
-                print(f"Успешно: метрики для '{model_name}' из группы '{group_name}' сохранены в {pkl_path}")
+                with open(json_path, 'w', encoding='utf-8') as f:
+                    json.dump(history_obj, f, ensure_ascii=False, indent=2)
+                print(f"Успешно: метрики для '{model_name}' из группы '{group_name}' сохранены в {json_path}")
                 saved_count += 1
             except Exception as e:
                 failed_count += 1
-                error_msg = f"Ошибка сохранения {pkl_path}: {e}"
+                error_msg = f"Ошибка сохранения {json_path}: {e}"
                 print(error_msg)
                 error_details.append(error_msg)
     
     # Выводим итоговую статистику
     if saved_count > 0:
-        print(f"\nИтого: сохранено {saved_count} .pkl файлов с метриками в каталоге {base_dir}")
+        print(f"\nИтого: сохранено {saved_count} .json файлов с метриками в каталоге {base_dir}")
     
     if failed_count > 0:
         print(f"Внимание: не удалось сохранить {failed_count} файлов.")
@@ -636,4 +685,12 @@ def save_metrics_to_pkl(results: Dict[str, Dict[str, Dict[str, float]]], base_di
             print(f"  - {err}")
     
     if saved_count == 0:
-        print(f"Предупреждение: не удалось сохранить ни одного .pkl файла с метриками!") 
+        print(f"Предупреждение: не удалось сохранить ни одного .json файла с метриками!")
+
+# Function is deprecated - will be removed in the future
+def save_metrics_to_pkl(results: Dict[str, Dict[str, Dict[str, float]]], base_dir: str = 'model_save_preset/history') -> None:
+    """
+    DEPRECATED: Use save_metrics_to_json instead.
+    """
+    print("Warning: save_metrics_to_pkl is deprecated. Using save_metrics_to_json instead.")
+    save_metrics_to_json(results, base_dir) 

@@ -1,0 +1,16 @@
+{
+  "history": {
+    "mse": 0.32145104928600715,
+    "mae": 0.463595246330521,
+    "rmse": 0.566966532774208,
+    "r2": -5.281672922432592,
+    "explained_var": -5.172687127776381,
+    "max_error": 1.61205442446145,
+    "median_abs_error": 0.40851680632487164,
+    "mape": NaN
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "model_gru_best_20250407_0745",
+  "group_name": "3 alt_model"
+}

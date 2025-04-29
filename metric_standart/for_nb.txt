@@ -64,7 +64,7 @@ from metric_standart.model_evaluator import (
     evaluate_models,
     save_evaluation_results,
     plot_prediction_comparison,
-    save_metrics_to_pkl
+    save_metrics_to_json
 )
 
 __all__ = [
@@ -73,7 +73,7 @@ __all__ = [
     'evaluate_models',
     'save_evaluation_results',
     'plot_prediction_comparison',
-    'save_metrics_to_pkl'
+    'save_metrics_to_json'
 ]
 
 # Ячейка 6: Импорт модулей оценки
@@ -86,7 +86,7 @@ from metric_standart.model_evaluator import (
     evaluate_models,
     save_evaluation_results,
     plot_prediction_comparison,
-    save_metrics_to_pkl
+    save_metrics_to_json
 )
 
 # Ячейка 7: Загрузка и подготовка данных
@@ -171,121 +171,37 @@ output_file = 'metric_standart/extended_model_metrics.csv'
 save_evaluation_results(results, output_file)
 print(f"Результаты оценки сохранены в {output_file}")
 
-# Ячейка 10.5: Сохранение метрик в .pkl файлы
-print("Сохранение метрик в .pkl файлах вместо генерации графиков...")
+# Ячейка 10.5: Сохранение метрик в JSON файлы
+print("Сохранение метрик в JSON файлах...")
 
 # Создаем директорию для истории метрик
 history_dir = 'model_save_preset/history'
 !mkdir -p "{history_dir}"
 
-# Удаляем существующие .pkl файлы перед созданием новых
-!find "{history_dir}" -name "*.pkl" -delete
-print("Существующие .pkl файлы удалены")
+# Удаляем существующие файлы перед созданием новых
+!find "{history_dir}" -name "*.json" -delete
+print("Существующие JSON файлы удалены")
 
-# Сохраняем метрики напрямую без использования функции plot_prediction_comparison
-import pickle
-
-# Создаем структуру директорий для всех групп моделей
-model_groups = sorted(list(models.keys()))
-print(f"Создание директорий для {len(model_groups)} групп моделей...")
-
-# Формируем единый набор метрик для всех моделей
-all_metrics = [
-    'mae', 'mse', 'rmse', 'mape', 'r2_score', 
-    'explained_variance', 'max_error', 'median_absolute_error',
-    'norm_mae', 'norm_rmse'
-]
-
-# Убедимся, что в результатах каждой модели есть все метрики
-for group_name, group_models in results.items():
-    for model_name, metrics in group_models.items():
-        # Если нет метрик или словарь пустой, инициализируем его
-        if not metrics:
-            results[group_name][model_name] = {}
-        
-        # Добавим отсутствующие метрики со значением None
-        for metric in all_metrics:
-            if metric not in results[group_name][model_name]:
-                results[group_name][model_name][metric] = None
-
-# Счетчики статистики
-saved_files = 0
-failed_files = 0
-
-# Перебираем все группы и модели
-for group_name in model_groups:
-    # Создаем директорию группы
-    group_dir = os.path.join(history_dir, group_name)
-    !mkdir -p "{group_dir}"
-    print(f"Обработка группы: {group_name}")
-    
-    # Проверяем, есть ли результаты для этой группы
-    if group_name not in results:
-        print(f"  Нет результатов для группы {group_name}")
-        continue
-    
-    # Перебираем все модели в группе
-    for model_name, model_metrics in results[group_name].items():
-        # Создаем объект history
-        history_obj = {
-            'history': model_metrics,
-            'params': {},
-            'epoch': [],
-            'model_name': model_name,
-            'group_name': group_name,
-            'metrics': all_metrics  # Добавляем список всех метрик для документации
-        }
-        
-        # Формируем путь к файлу
-        pkl_path = os.path.join(group_dir, f"{model_name}.pkl")
-        
-        # Сохраняем файл
-        try:
-            with open(pkl_path, 'wb') as f:
-                pickle.dump(history_obj, f)
-            print(f"  ✓ Сохранен: {pkl_path}")
-            saved_files += 1
-        except Exception as e:
-            print(f"  ✗ Ошибка: {pkl_path} - {str(e)}")
-            failed_files += 1
-            
-            # Попробуем сохранить с безопасным именем
-            try:
-                # Создаем директорию без пробелов
-                safe_group_name = group_name.replace(" ", "_")
-                safe_group_dir = os.path.join(history_dir, safe_group_name)
-                !mkdir -p "{safe_group_dir}"
-                
-                # Формируем безопасный путь
-                safe_pkl_path = os.path.join(safe_group_dir, f"{model_name}.pkl")
-                
-                # Пробуем сохранить
-                with open(safe_pkl_path, 'wb') as f:
-                    pickle.dump(history_obj, f)
-                print(f"  ✓ Сохранен альтернативно: {safe_pkl_path}")
-                saved_files += 1
-            except Exception as e2:
-                print(f"  ✗ Полная ошибка: {str(e2)}")
-
-# Выводим итоговую статистику
-print(f"\nСохранено {saved_files} .pkl файлов, ошибок: {failed_files}")
+# Сохраняем метрики с помощью функции save_metrics_to_json
+save_metrics_to_json(results, history_dir)
 
 # Проверка результатов сохранения
-print("\nСписок всех сохраненных .pkl файлов:")
-!find "{history_dir}" -name "*.pkl" | sort
+print("\nСписок всех сохраненных .json файлов:")
+!find "{history_dir}" -name "*.json" | sort
 
-total_found = !find "{history_dir}" -name "*.pkl" | wc -l
-total_expected = sum(len(results.get(group, {})) for group in model_groups)
-print(f"Найдено {total_found[0]} .pkl файлов из {total_expected} ожидаемых")
+total_found = !find "{history_dir}" -name "*.json" | wc -l
+total_expected = sum(len(results.get(group, {})) for group in results.keys())
+print(f"Найдено {total_found[0]} .json файлов из {total_expected} ожидаемых")
 
-# Дополнительная проверка - вывод содержимого случайного .pkl файла для подтверждения корректности
-pkl_files = !find "{history_dir}" -name "*.pkl"
-if pkl_files:
-    sample_file = pkl_files[0]
+# Дополнительная проверка - вывод содержимого случайного .json файла для подтверждения корректности
+json_files = !find "{history_dir}" -name "*.json"
+if json_files:
+    sample_file = json_files[0]
     print(f"\nПроверка содержимого файла {sample_file}:")
     try:
-        with open(sample_file, 'rb') as f:
-            sample_data = pickle.load(f)
+        import json
+        with open(sample_file, 'r', encoding='utf-8') as f:
+            sample_data = json.load(f)
         print(f"Группа: {sample_data.get('group_name')}")
         print(f"Модель: {sample_data.get('model_name')}")
         metrics = sample_data.get('history', {})
@@ -294,7 +210,33 @@ if pkl_files:
         print(f"Ошибка чтения файла: {str(e)}")
 
 # Ячейка 11: Генерация графиков прогнозов для каждой модели
-# УДАЛЕНО: Эта ячейка больше не создает графики, только сохраняет метрики в .pkl файлы
+print("Генерация графиков прогнозов для моделей...")
+plots_dir = 'metric_standart/plots'
+!mkdir -p "{plots_dir}"
+
+# Ограничиваем количество моделей для генерации графиков, чтобы не создавать слишком много файлов
+max_models_per_group = 2
+model_count = 0
+
+for group_name, group_models in models.items():
+    print(f"Группа: {group_name}")
+    counter = 0
+    
+    for model_name in list(group_models.keys())[:max_models_per_group]:
+        try:
+            print(f"  Создание графика для модели {model_name}...")
+            plot_prediction_comparison(
+                models, data, group_name, model_name, 
+                num_samples=100, output_dir=plots_dir
+            )
+            counter += 1
+            model_count += 1
+        except Exception as e:
+            print(f"  Ошибка при создании графика для {model_name}: {e}")
+    
+    print(f"  Создано {counter} графиков для группы {group_name}")
+
+print(f"Всего создано {model_count} графиков прогнозов")
 
 # Ячейка 12: Анализ - Импорт модуля анализа
 from metric_standart.analyze_results import (
@@ -352,12 +294,12 @@ except Exception as e:
 # Ячейка 16: Создание графиков производительности по группам
 try:
     if len(df) > 0:
-        for metric in ['rmse', 'mae', 'r2_score']:
+        for metric in ['rmse', 'mae', 'r2']:
             if metric in df.columns:
                 plot_group_performance(df, metric, plots_dir)
         
         # Если ни одна из стандартных метрик не найдена, попробуем использовать любую доступную
-        metrics_found = any(metric in df.columns for metric in ['rmse', 'mae', 'r2_score'])
+        metrics_found = any(metric in df.columns for metric in ['rmse', 'mae', 'r2'])
         if not metrics_found:
             available_metrics = [col for col in df.columns if col not in ['Group', 'Model']]
             if available_metrics:
@@ -426,10 +368,10 @@ if os.path.exists('metric_standart/extended_model_metrics.csv'):
 if os.path.exists('metric_standart/model_summary.txt'):
     files_to_copy.append('metric_standart/model_summary.txt')
 
-# .pkl файлы с метриками
-# Поиск обычных .pkl файлов
-pkl_files = glob.glob('model_save_preset/history/**/*.pkl', recursive=True)
-print(f"Найдено {len(pkl_files)} обычных .pkl файлов с метриками")
+# .json файлы с метриками
+# Поиск обычных .json файлов
+json_files = glob.glob('model_save_preset/history/**/*.json', recursive=True)
+print(f"Найдено {len(json_files)} обычных .json файлов с метриками")
 
 # Также проверяем альтернативные безопасные директории (с заменой пробелов на подчеркивания)
 safe_model_groups = []
@@ -438,26 +380,26 @@ for group in models.keys():
     if safe_group != group:
         safe_model_groups.append(safe_group)
 
-# Ищем дополнительные .pkl файлы в безопасных директориях
-alt_pkl_files = []
+# Ищем дополнительные .json файлы в безопасных директориях
+alt_json_files = []
 for safe_group in safe_model_groups:
     safe_dir = os.path.join('model_save_preset/history', safe_group)
     if os.path.exists(safe_dir):
-        alt_files = glob.glob(f'{safe_dir}/*.pkl')
-        alt_pkl_files.extend(alt_files)
+        alt_files = glob.glob(f'{safe_dir}/*.json')
+        alt_json_files.extend(alt_files)
 
-print(f"Дополнительно найдено {len(alt_pkl_files)} .pkl файлов в безопасных директориях")
+print(f"Дополнительно найдено {len(alt_json_files)} .json файлов в безопасных директориях")
 
 # Объединяем все файлы
-all_pkl_files = pkl_files + alt_pkl_files
-print(f"Всего найдено {len(all_pkl_files)} .pkl файлов")
+all_json_files = json_files + alt_json_files
+print(f"Всего найдено {len(all_json_files)} .json файлов")
 
-for pkl in all_pkl_files[:5]:  # Показываем первые 5 файлов для примера
-    print(f"  - {pkl}")
-if len(all_pkl_files) > 5:
-    print(f"  - ... и еще {len(all_pkl_files) - 5} файлов")
+for json_file in all_json_files[:5]:  # Показываем первые 5 файлов для примера
+    print(f"  - {json_file}")
+if len(all_json_files) > 5:
+    print(f"  - ... и еще {len(all_json_files) - 5} файлов")
 
-files_to_copy.extend(all_pkl_files)
+files_to_copy.extend(all_json_files)
 
 # Копируем файлы во временную директорию
 if files_to_copy:

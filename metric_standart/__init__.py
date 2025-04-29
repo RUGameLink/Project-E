@@ -11,6 +11,7 @@ from .model_evaluator import (
     evaluate_models,
     save_evaluation_results,
     plot_prediction_comparison,
+    save_metrics_to_json,
     save_metrics_to_pkl
 )
 
@@ -20,5 +21,6 @@ __all__ = [
     'evaluate_models',
     'save_evaluation_results',
     'plot_prediction_comparison',
+    'save_metrics_to_json',
     'save_metrics_to_pkl'
 ] 

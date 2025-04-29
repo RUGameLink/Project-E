@@ -1,0 +1,16 @@
+{
+  "history": {
+    "mse": 0.3409184023706102,
+    "mae": 0.5103704473076335,
+    "rmse": 0.5838821819259518,
+    "r2": -5.662096458192097,
+    "explained_var": -2.147591530857773,
+    "max_error": 1.1297094236930525,
+    "median_abs_error": 0.5324082463685813,
+    "mape": NaN
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "model_lstm_20250407_1028",
+  "group_name": "4 alt_new_model"
+}

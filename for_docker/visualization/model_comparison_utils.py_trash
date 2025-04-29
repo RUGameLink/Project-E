@@ -1,0 +1,720 @@
+import os
+import json
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+try:
+    from tensorflow.keras.models import load_model
+except ImportError:
+    # Создаем заглушку для load_model, которая выдаст понятную ошибку
+    def load_model(*args, **kwargs):
+        raise ImportError("TensorFlow не установлен. Используйте Python 3.10 или 3.11, или установите tensorflow>=2.16.1 вручную.")
+import plotly.express as px
+import plotly.graph_objects as go
+import pickle
+from pathlib import Path
+import sys
+import logging
+
+# Импортируем константы из dashboard.py
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+try:
+    from dashboard import METRIC_DISPLAY_NAMES
+except ImportError:
+    # Если импорт не удался, определим локальную версию
+    METRIC_DISPLAY_NAMES = {
+        'rmse': 'Корень из среднеквадратичной ошибки (RMSE)',
+        'explained_variance': 'Объяснённая дисперсия',
+        'mae': 'Средняя абсолютная ошибка (MAE)',
+        'max_error': 'Максимальная ошибка',
+        'mse': 'Среднеквадратичная ошибка (MSE)'
+    }
+
+def load_all_histories(base_path="../model_save_preset"):
+    """Load all history files from the history directory."""
+    base_path = Path(base_path)
+    history_path = base_path / "history"
+    
+    print(f"Loading histories from {history_path}")
+    
+    if not os.path.exists(history_path):
+        print(f"История обучения не найдена: {history_path}")
+        return {}
+    
+    all_histories = {}
+    
+    # Get all model group directories
+    all_groups = []
+    try:
+        all_groups = [d for d in os.listdir(history_path) if os.path.isdir(history_path / d)]
+        print(f"Найдены группы моделей: {all_groups}")
+    except Exception as e:
+        print(f"Ошибка при сканировании директории истории: {e}")
+        return {}
+    
+    # Скан групп истории (директорий)
+    for group_dir in sorted(all_groups):
+        group_path = history_path / group_dir
+        
+        if os.path.isdir(group_path):
+            print(f"Обработка группы: {group_dir}")
+            group_histories = {}
+            history_files_found = False
+            
+            # Получаем все файлы в директории
+            all_files = os.listdir(group_path)
+            
+            # Обрабатываем все .json и .pkl файлы
+            history_files = [f for f in all_files if f.endswith('.json') or f.endswith('.pkl')]
+            
+            print(f"  Group {group_dir}: Found {len(history_files)} history files")
+            
+            if history_files:
+                # Обрабатываем файлы
+                for history_file in history_files:
+                    try:
+                        # Извлекаем имя модели из пути файла
+                        model_name = None
+                        
+                        # Новый стандартизированный формат: model_save_preset_history_GROUP_MODEL.json
+                        if history_file.startswith('model_save_preset_history_'):
+                            parts = history_file.split('model_save_preset_history_')[1].split('.')[0]
+                            parts_segments = parts.split('_')
+                            
+                            # Для группы 1 и 2 (1_old_rnn, 2_new_gru)
+                            if parts_segments[0] in ['1', '2', '3', '4']:
+                                if len(parts_segments) >= 3:
+                                    model_name = parts_segments[-1]  # Последняя часть - имя модели
+                            # Для групп 3 и 4, имя модели может содержать дату (model_lstm_20250407_0741)
+                            else:
+                                model_name = '_'.join(parts_segments[2:])  # Все после group_name
+                        else:
+                            # Использовать имя файла без расширения как запасной вариант
+                            model_name = history_file.split('.')[0]
+                        
+                        history_file_path = group_path / history_file
+                        history_data = None
+                        
+                        try:
+                            if history_file.endswith('.pkl'):
+                                with open(history_file_path, 'rb') as f:
+                                    try:
+                                        history_data = pickle.load(f)
+                                    except Exception as pkl_err:
+                                        print(f"  Ошибка загрузки PKL файла {history_file}: {pkl_err}")
+                                        continue
+                            elif history_file.endswith('.json'):
+                                with open(history_file_path, 'r', encoding='utf-8') as f:
+                                    try:
+                                        history_data = json.load(f)
+                                    except UnicodeDecodeError:
+                                        # Пробуем другую кодировку если UTF-8 не работает
+                                        with open(history_file_path, 'r', encoding='latin-1') as f2:
+                                            history_data = json.load(f2)
+                            
+                            # Получаем имя модели из data если доступно
+                            if isinstance(history_data, dict):
+                                if 'model_name' in history_data:
+                                    model_name = history_data['model_name']
+                                
+                                # Стандартизируем метрики для старых форматов истории
+                                if 'history' in history_data and isinstance(history_data['history'], dict):
+                                    # Создаем или обновляем словарь metrics если его нет
+                                    if 'metrics' not in history_data or not history_data['metrics']:
+                                        history_data['metrics'] = {}
+                                    
+                                    # Старый формат использует 'r2' вместо 'r2_score'
+                                    if 'r2' in history_data['history'] and 'r2_score' not in history_data['history']:
+                                        history_data['history']['r2_score'] = history_data['history']['r2']
+                                        history_data['metrics']['r2_score'] = history_data['history']['r2']
+                                    
+                                    # Старый формат использует 'explained_var' вместо 'explained_variance'
+                                    if 'explained_var' in history_data['history'] and 'explained_variance' not in history_data['history']:
+                                        history_data['history']['explained_variance'] = history_data['history']['explained_var']
+                                        history_data['metrics']['explained_variance'] = history_data['history']['explained_var']
+                                    
+                                    # Копируем основные метрики из history в metrics для совместимости
+                                    for metric in history_data['history']:
+                                        if metric not in history_data['metrics']:
+                                            # Берем последнее значение если это список, иначе берем значение напрямую
+                                            if isinstance(history_data['history'][metric], list) and history_data['history'][metric]:
+                                                history_data['metrics'][metric] = history_data['history'][metric][-1]
+                                            else:
+                                                history_data['metrics'][metric] = history_data['history'][metric]
+                            
+                            # Сохраняем историю с типом модели в качестве ключа
+                            if model_name:
+                                group_histories[model_name] = history_data
+                                history_files_found = True
+                                print(f"  Загружена история для модели {model_name} в группе {group_dir}")
+                            
+                        except Exception as e:
+                            print(f"  Ошибка обработки файла истории {history_file}: {e}")
+                            continue
+                        
+                    except Exception as e:
+                        print(f"  Ошибка загрузки файла истории {history_file}: {e}")
+            
+            # Если файлы истории не найдены, создаем заглушку
+            if not history_files_found:
+                print(f"  В группе {group_dir} не найдено файлов истории, создаем заглушку")
+                model_name = f"placeholder_{group_dir}"
+                group_histories[model_name] = {
+                    'model_name': model_name,
+                    'group_name': group_dir,
+                    'history': {
+                        'rmse': [0.1],
+                        'explained_variance': [0.7],
+                        'mae': [0.15],
+                        'max_error': [0.3],
+                        'mse': [0.01]
+                    },
+                    'metrics': {
+                        'rmse': 0.1,
+                        'explained_variance': 0.7,
+                        'mae': 0.15,
+                        'max_error': 0.3,
+                        'mse': 0.01
+                    },
+                    'epoch': [],
+                    'params': [],
+                    '__placeholder__': True
+                }
+            
+            # Добавляем истории для этой группы
+            all_histories[group_dir] = group_histories
+    
+    # Проверим, нашли ли мы хоть какие-то группы
+    if not all_histories:
+        print("Не найдено ни одной группы с файлами истории. Создаем пустую группу для демонстрации.")
+        all_histories['demo_group'] = {
+            'demo_model': {
+                'model_name': 'demo_model',
+                'group_name': 'demo_group',
+                'history': {
+                    'rmse': [0.1, 0.08, 0.06],
+                    'explained_variance': [0.5, 0.6, 0.7],
+                    'mae': [0.15, 0.12, 0.10],
+                    'max_error': [0.3, 0.25, 0.2],
+                    'mse': [0.01, 0.008, 0.006]
+                },
+                'metrics': {
+                    'rmse': 0.06,
+                    'explained_variance': 0.7,
+                    'mae': 0.10,
+                    'max_error': 0.2,
+                    'mse': 0.006
+                },
+                'epoch': [1, 2, 3],
+                'params': [],
+                '__placeholder__': True
+            }
+        }
+    
+    print(f"Всего загружено групп: {len(all_histories)}")
+    for group, models in all_histories.items():
+        print(f"  Группа {group}: {len(models)} моделей")
+    
+    return all_histories
+
+def get_best_models(all_histories, metric="rmse", is_higher_better=False):
+    """
+    Identify the best performing models based on a metric.
+    
+    Args:
+        all_histories: Dictionary of history objects by group and model
+        metric: Metric to evaluate (e.g., 'rmse', 'r2_score')
+        is_higher_better: True if higher metric is better (e.g., r2_score), 
+                         False if lower is better (e.g., rmse)
+    
+    Returns:
+        Dictionary of best models by group
+    """
+    best_models = {}
+    
+    for group_name, group_histories in all_histories.items():
+        best_value = None
+        best_model = None
+        
+        for model_name, history in group_histories.items():
+            # Skip placeholder models
+            if isinstance(history, dict) and history.get('__placeholder__', False):
+                continue
+                
+            # Check for metrics in standardized format
+            final_value = None
+            
+            if isinstance(history, dict) and 'metrics' in history:
+                # Get metric value based on metrics type (dict or list)
+                if isinstance(history['metrics'], dict) and metric in history['metrics']:
+                    # Dictionary format
+                    final_value = history['metrics'][metric]
+                elif isinstance(history['metrics'], list):
+                    # List format - use fallback to history data
+                    pass
+            
+            # Fallback to history data if metrics not available
+            if final_value is None and isinstance(history, dict) and 'history' in history and isinstance(history['history'], dict):
+                if metric in history['history']:
+                    # Get the final value of the metric from history
+                    if history['history'][metric] is not None and len(history['history'][metric]) > 0:
+                        final_value = history['history'][metric][-1]
+            
+            # Update best model if this one is better
+            if final_value is not None:
+                if best_value is None or \
+                  (is_higher_better and final_value > best_value) or \
+                  (not is_higher_better and final_value < best_value):
+                    best_value = final_value
+                    best_model = model_name
+        
+        if best_model:
+            best_models[group_name] = {
+                'model_name': best_model,
+                'value': best_value,
+                'history': group_histories[best_model]
+            }
+    
+    return best_models
+
+def create_metrics_comparison(all_histories, metrics=None):
+    """
+    Create a DataFrame comparing metrics across all models.
+    
+    Args:
+        all_histories: Dictionary of model histories by group and model name
+        metrics: List of metrics to include in comparison
+    
+    Returns:
+        DataFrame with comparison data
+    """
+    if metrics is None:
+        # Default metrics to compare
+        metrics = [
+            'rmse', 'norm_rmse', 'explained_variance', 
+            'mae', 'max_error', 'median_absolute_error', 'mse', 'norm_mae'
+        ]
+    
+    # Collect all data in a list of dictionaries
+    all_data = []
+    
+    for group, group_models in all_histories.items():
+        for model_name, history in group_models.items():
+            # Skip placeholders
+            if isinstance(history, dict) and history.get('__placeholder__', False):
+                continue
+                
+            model_data = {
+                'group': group,
+                'model': model_name,
+            }
+            
+            # First, try to get metrics from the metrics dictionary (preferred)
+            if isinstance(history, dict) and 'metrics' in history and isinstance(history['metrics'], dict):
+                for metric in metrics:
+                    # Check for both old and new metric names
+                    if metric in history['metrics']:
+                        model_data[metric] = history['metrics'][metric]
+                    elif metric == 'r2_score' and 'r2' in history['metrics']:
+                        model_data[metric] = history['metrics']['r2']
+                    elif metric == 'explained_variance' and 'explained_var' in history['metrics']:
+                        model_data[metric] = history['metrics']['explained_var']
+            
+            # If metrics not available, try to get from history directly
+            if isinstance(history, dict) and 'history' in history and isinstance(history['history'], dict):
+                for metric in metrics:
+                    # Only grab metrics not already found
+                    if metric not in model_data:
+                        # Check for both old and new metric names
+                        if metric in history['history']:
+                            # Get the last value if it's a list, otherwise use the value directly
+                            metric_values = history['history'][metric]
+                            if isinstance(metric_values, list) and len(metric_values) > 0:
+                                model_data[metric] = metric_values[-1]
+                            elif not isinstance(metric_values, list):
+                                model_data[metric] = metric_values
+                        elif metric == 'r2_score' and 'r2' in history['history']:
+                            # Handle older format with 'r2' instead of 'r2_score'
+                            r2_values = history['history']['r2']
+                            if isinstance(r2_values, list) and len(r2_values) > 0:
+                                model_data[metric] = r2_values[-1]
+                            elif not isinstance(r2_values, list):
+                                model_data[metric] = r2_values
+                        elif metric == 'explained_variance' and 'explained_var' in history['history']:
+                            # Handle older format with 'explained_var' instead of 'explained_variance'
+                            var_values = history['history']['explained_var']
+                            if isinstance(var_values, list) and len(var_values) > 0:
+                                model_data[metric] = var_values[-1]
+                            elif not isinstance(var_values, list):
+                                model_data[metric] = var_values
+            
+            # Add model to comparison if we have any metrics
+            if len(model_data) > 2:  # more than just group and model name
+                all_data.append(model_data)
+    
+    # Create DataFrame
+    if all_data:
+        return pd.DataFrame(all_data)
+    else:
+        # Return empty DataFrame with expected columns
+        columns = ['group', 'model'] + list(metrics)
+        return pd.DataFrame(columns=columns)
+
+def plot_metric_comparison(comparison_df, metric, title=None):
+    """
+    Create a bar chart comparing the given metric across all models.
+    
+    Args:
+        comparison_df: DataFrame with model metrics
+        metric: Metric to plot
+        title: Optional title for the plot
+    
+    Returns:
+        Plotly figure object
+    """
+    if metric not in comparison_df.columns:
+        return None
+    
+    # Sort by metric value
+    is_higher_better = metric in ['explained_variance']
+    df_sorted = comparison_df.sort_values(by=metric, ascending=not is_higher_better)
+    
+    # Create model labels with group information
+    df_sorted['model_label'] = df_sorted['model'] + ' (' + df_sorted['group'] + ')'
+    
+    # Create color mapping by group
+    groups = df_sorted['group'].unique()
+    color_map = {group: f'rgba({hash(group) % 255}, {(hash(group) // 255) % 255}, {(hash(group) // (255*255)) % 255}, 0.7)' 
+                 for group in groups}
+    
+    # Create bar colors based on group
+    bar_colors = [color_map[group] for group in df_sorted['group']]
+    
+    # Create bar chart
+    fig = go.Figure(data=[
+        go.Bar(
+            x=df_sorted['model_label'],
+            y=df_sorted[metric],
+            marker_color=bar_colors
+        )
+    ])
+    
+    # Update layout
+    fig.update_layout(
+        title=title or f'Comparison of {metric} across models',
+        xaxis_title='Model',
+        yaxis_title=metric,
+        height=500,
+        xaxis={'categoryorder': 'array', 'categoryarray': df_sorted['model_label']}
+    )
+    
+    return fig
+
+def create_radar_chart(comparison_df, metrics=None, normalize=True):
+    """
+    Create a radar chart comparing models across multiple metrics.
+    
+    Args:
+        comparison_df: DataFrame with model metrics
+        metrics: List of metrics to include (if None, use all numeric columns)
+        normalize: Whether to normalize metrics to 0-1 scale
+    
+    Returns:
+        Plotly figure object
+    """
+    if comparison_df.empty:
+        return None
+    
+    # Select metrics to use
+    if metrics is None:
+        metrics = [col for col in comparison_df.columns 
+                   if col not in ['group', 'model'] 
+                   and pd.api.types.is_numeric_dtype(comparison_df[col])]
+    else:
+        # Filter to only include metrics that exist in the DataFrame
+        metrics = [m for m in metrics if m in comparison_df.columns]
+    
+    if not metrics:
+        return None
+    
+    # Determine if higher is better for each metric
+    higher_is_better = {
+        'explained_variance': True,
+        'rmse': False,
+        'mse': False,
+        'mae': False,
+        'max_error': False,
+        'median_absolute_error': False,
+        'norm_rmse': False,
+        'norm_mae': False
+    }
+    
+    # Create a copy for normalization
+    df = comparison_df.copy()
+    
+    # Normalize metrics to 0-1 scale where 1 is always better
+    if normalize:
+        for metric in metrics:
+            if not pd.api.types.is_numeric_dtype(df[metric]):
+                continue
+            
+            # Determine whether higher or lower is better for this metric
+            is_higher_better = higher_is_better.get(metric, True)
+            
+            # Normalize based on whether higher or lower is better
+            if is_higher_better:
+                min_val = df[metric].min()
+                max_val = df[metric].max()
+                if max_val > min_val:
+                    df[metric] = (df[metric] - min_val) / (max_val - min_val)
+                else:
+                    min_val = df[metric].min()
+                    max_val = df[metric].max()
+                    if max_val > min_val:
+                        df[metric] = 1 - (df[metric] - min_val) / (max_val - min_val)
+    
+    # Create radar chart
+    fig = go.Figure()
+    
+    # Add traces for each model
+    for _, row in df.iterrows():
+        model_name = row['model']
+        group_name = row['group']
+        
+        # Get values for this model
+        values = [row[m] for m in metrics]
+        # Add the first value again to close the polygon
+        values.append(values[0])
+        
+        # Create a label that includes both model and group
+        label = f"{model_name} ({group_name})"
+        
+        # Add trace
+        fig.add_trace(go.Scatterpolar(
+            r=values,
+            theta=metrics + [metrics[0]],  # Complete the loop
+            fill='toself',
+            name=label
+        ))
+    
+    # Update layout
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 1] if normalize else None
+            )
+        ),
+        title="Model Comparison Across Metrics",
+        height=600,
+        showlegend=True
+    )
+    
+    return fig
+
+def plot_training_progress(all_histories, selected_models, metric='rmse'):
+    """
+    Plot training progress for multiple models.
+    
+    Args:
+        all_histories: Dictionary of history objects
+        selected_models: List of tuples (group, model_name) to include
+        metric: Metric to plot
+    
+    Returns:
+        Plotly figure or None if no data
+    """
+    if not selected_models:
+        return None
+    
+    fig = go.Figure()
+    
+    # Цветовая схема
+    colors = px.colors.qualitative.D3
+    
+    # Список для хранения всех значений метрик
+    all_metric_values = []
+    
+    for idx, (group, model_name) in enumerate(selected_models):
+        if group in all_histories and model_name in all_histories[group]:
+            history = all_histories[group][model_name]
+            
+            # Check if history data is available
+            if isinstance(history, dict) and 'history' in history:
+                history_data = history['history']
+                
+                # Check if the specific metric is in history
+                if isinstance(history_data, dict) and metric in history_data:
+                    metric_values = history_data[metric]
+                    
+                    # Handle both list and scalar values
+                    if isinstance(metric_values, list) and len(metric_values) > 0:
+                        # Для списка значений (история по эпохам)
+                        epochs = list(range(1, len(metric_values) + 1))
+                        
+                        # Сохраняем все значения для статистики
+                        all_metric_values.extend(metric_values)
+                        
+                        # Формат имени для отображения: группа - модель
+                        display_name = f"{group} - {model_name}"
+                        
+                        # Цвет линии и маркеров из цветовой схемы
+                        color = colors[idx % len(colors)]
+                        
+                        # Добавляем основную линию
+                        fig.add_trace(go.Scatter(
+                            x=epochs,
+                            y=metric_values,
+                            mode='lines+markers',
+                            name=display_name,
+                            line=dict(color=color, width=2),
+                            marker=dict(size=8, symbol='circle'),
+                            legendgroup=display_name,
+                            hovertemplate=f"<b>{display_name}</b><br>Эпоха: %{{x}}<br>{metric}: %{{y:.4f}}<extra></extra>"
+                        ))
+                        
+                        # Вычисляем скользящее среднее, если точек больше 2
+                        if len(metric_values) > 2:
+                            window_size = min(3, len(metric_values))
+                            # Используем скользящее среднее с окном
+                            moving_avg = np.convolve(metric_values, np.ones(window_size)/window_size, mode='valid')
+                            # Выравниваем длину с исходным массивом
+                            padding = [None] * (len(metric_values) - len(moving_avg))
+                            moving_avg_padded = padding + list(moving_avg)
+                            
+                            # Добавляем линию скользящего среднего
+                            fig.add_trace(go.Scatter(
+                                x=epochs,
+                                y=moving_avg_padded,
+                                mode='lines',
+                                name=f"{display_name} (тренд)",
+                                line=dict(color=color, width=1.5, dash='dash'),
+                                legendgroup=display_name,
+                                showlegend=False,
+                                hoverinfo='skip'
+                            ))
+                            
+                        # Добавляем аннотацию для последнего значения
+                        fig.add_annotation(
+                            x=epochs[-1],
+                            y=metric_values[-1],
+                            text=f"{metric_values[-1]:.4f}",
+                            showarrow=True,
+                            arrowhead=2,
+                            arrowsize=1,
+                            arrowwidth=1,
+                            arrowcolor=color,
+                            font=dict(size=10, color=color),
+                            bgcolor="rgba(255, 255, 255, 0.8)",
+                            bordercolor=color,
+                            borderwidth=1,
+                            borderpad=2,
+                            ax=20,
+                            ay=-30
+                        )
+                        
+                    elif not isinstance(metric_values, list):
+                        # Для одиночного скалярного значения (финальные метрики)
+                        display_name = f"{group} - {model_name}"
+                        color = colors[idx % len(colors)]
+                        
+                        # Добавляем точку на график
+                        fig.add_trace(go.Scatter(
+                            x=[1],
+                            y=[metric_values],
+                            mode='markers',
+                            name=display_name,
+                            marker=dict(size=12, color=color),
+                            hovertemplate=f"<b>{display_name}</b><br>{metric}: %{{y:.4f}}<extra></extra>"
+                        ))
+                        
+                        # Добавляем аннотацию к точке
+                        fig.add_annotation(
+                            x=1,
+                            y=metric_values,
+                            text=f"{metric_values:.4f}",
+                            showarrow=True,
+                            arrowhead=2,
+                            arrowsize=1,
+                            arrowwidth=1,
+                            arrowcolor=color,
+                            font=dict(size=10, color=color),
+                            bgcolor="rgba(255, 255, 255, 0.8)",
+                            bordercolor=color,
+                            borderwidth=1,
+                            borderpad=2,
+                            ax=20,
+                            ay=-30
+                        )
+    
+    # If we have added any traces
+    if len(fig.data) > 0:
+        # Используем дисплейное имя метрики если доступно
+        metric_display_name = metric
+        
+        # Добавляем горизонтальную линию для среднего значения, если у нас есть данные
+        if all_metric_values:
+            avg_value = np.mean(all_metric_values)
+            std_value = np.std(all_metric_values)
+            
+            # Добавляем линию среднего значения
+            fig.add_shape(
+                type="line",
+                x0=0.5,
+                y0=avg_value,
+                x1=len(fig.data)+0.5,
+                y1=avg_value,
+                line=dict(
+                    color="rgba(50, 50, 50, 0.5)",
+                    width=1,
+                    dash="dot",
+                ),
+            )
+            
+            # Добавляем аннотацию для среднего значения
+            fig.add_annotation(
+                x=0.5,
+                y=avg_value,
+                text=f"Среднее: {avg_value:.4f}",
+                showarrow=False,
+                xanchor="left",
+                font=dict(size=10, color="rgba(50, 50, 50, 0.7)"),
+                bgcolor="rgba(255, 255, 255, 0.8)",
+                bordercolor="rgba(50, 50, 50, 0.5)",
+                borderwidth=1,
+                borderpad=2
+            )
+        
+        # Используем дисплейное имя метрики
+        if metric in METRIC_DISPLAY_NAMES:
+            metric_display_name = METRIC_DISPLAY_NAMES[metric]
+        
+        # Настраиваем макет
+        fig.update_layout(
+            title=f"Прогресс обучения - {metric_display_name}",
+            xaxis_title="Эпоха",
+            yaxis_title=metric_display_name,
+            hovermode="closest",
+            legend_title="Модели",
+            template="plotly_white",
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="center",
+                x=0.5,
+                bgcolor="rgba(255, 255, 255, 0.8)",
+                bordercolor="rgba(0, 0, 0, 0.3)",
+                borderwidth=1
+            )
+        )
+        
+        # Добавляем сетку
+        fig.update_xaxes(showgrid=True, gridwidth=0.5, gridcolor="rgba(0, 0, 0, 0.1)")
+        fig.update_yaxes(showgrid=True, gridwidth=0.5, gridcolor="rgba(0, 0, 0, 0.1)")
+        
+        return fig
+    else:
+        # No data found
+        return None 

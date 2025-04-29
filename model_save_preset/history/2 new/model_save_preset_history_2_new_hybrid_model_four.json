@@ -1,0 +1,16 @@
+{
+  "history": {
+    "mse": 0.06474536007371945,
+    "mae": 0.22657504771358028,
+    "rmse": 0.25445109564259977,
+    "r2": -0.2652289551755893,
+    "explained_var": -3.0527979191230514e-06,
+    "max_error": 0.5718622665723478,
+    "median_abs_error": 0.22857603077274025,
+    "mape": NaN
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "hybrid_model_four",
+  "group_name": "2 new"
+}
