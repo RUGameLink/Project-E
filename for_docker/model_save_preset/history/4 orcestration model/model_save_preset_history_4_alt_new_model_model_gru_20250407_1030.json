@@ -1,0 +1,16 @@
+{
+  "history": {
+    "mse": 0.20949620517926848,
+    "mae": 0.3857799238337769,
+    "rmse": 0.4577075542082176,
+    "r2": -3.093894365409616,
+    "explained_var": -3.0926520185146185,
+    "max_error": 1.1349859092832788,
+    "median_abs_error": 0.37047392868823237,
+    "mape": NaN
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "model_gru_20250407_1030",
+  "group_name": "4 alt_new_model"
+}

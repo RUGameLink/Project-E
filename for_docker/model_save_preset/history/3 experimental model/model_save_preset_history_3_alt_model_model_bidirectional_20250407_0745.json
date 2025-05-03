@@ -1,0 +1,16 @@
+{
+  "history": {
+    "mse": 0.5614175888675176,
+    "mae": 0.6377021845541649,
+    "rmse": 0.7492780450990925,
+    "r2": -9.971006857808364,
+    "explained_var": -9.69915239883325,
+    "max_error": 2.089787798103418,
+    "median_abs_error": 0.6293146604489607,
+    "mape": NaN
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "model_bidirectional_20250407_0745",
+  "group_name": "3 alt_model"
+}
