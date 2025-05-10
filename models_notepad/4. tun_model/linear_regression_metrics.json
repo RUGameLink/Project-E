@@ -1,0 +1,8 @@
+{
+    "best_params": {
+        "fit_intercept": true
+    },
+    "test_mse": 85652653.3527478,
+    "test_mae": 7311.011684899198,
+    "test_r2": -0.16033927140244875
+}
