@@ -1,19 +1,19 @@
-# Model Evaluation Toolkit
+# Инструментарий оценки моделей
 
-This toolkit provides utilities to evaluate neural network models from the model_save_preset directory with additional metrics such as RMSE, R^2 score, and others, which may not have been calculated during training.
+Этот инструментарий предоставляет утилиты для оценки моделей нейронных сетей из директории model_save_preset с дополнительными метриками, такими как RMSE, коэффициент детерминации R², и другими, которые могли не быть рассчитаны во время обучения.
 
-## Directory Structure
+## Структура директории
 
 ```
 metric_standart/
-├── model_evaluator.py      # Core module with evaluation functions
-├── run_evaluation.py       # Script to run model evaluation 
-├── analyze_results.py      # Script to analyze and visualize results
-├── plots/                  # Directory for generated plots
-└── README.md               # This file
+├── model_evaluator.py      # Основной модуль с функциями оценки
+├── run_evaluation.py       # Скрипт для запуска оценки моделей
+├── analyze_results.py      # Скрипт для анализа и визуализации результатов
+├── plots/                  # Директория для сгенерированных графиков
+└── README.md               # Этот файл
 ```
 
-## Requirements
+## Требования
 
 - Python 3.7+
 - TensorFlow 2.x
@@ -24,59 +24,59 @@ metric_standart/
 - Seaborn
 - scikit-learn
 
-You can install the required packages using:
+Вы можете установить необходимые пакеты с помощью:
 
 ```bash
 pip install tensorflow keras numpy pandas matplotlib seaborn scikit-learn
 ```
 
-## Usage
+## Использование
 
-### 1. Run Model Evaluation
+### 1. Запуск оценки моделей
 
-This script loads models from the model_save_preset directory, evaluates them with additional metrics, and saves the results to a CSV file.
+Этот скрипт загружает модели из директории model_save_preset, оценивает их с помощью дополнительных метрик и сохраняет результаты в CSV-файл.
 
 ```bash
 python metric_standart/run_evaluation.py --data data/data.csv --models-dir model_save_preset/models --output metric_standart/extended_model_metrics.csv
 ```
 
-Parameters:
-- `--data`: Path to the data file (default: 'data/data.csv')
-- `--models-dir`: Directory containing model groups (default: 'model_save_preset/models')
-- `--output`: Output file for metrics (default: 'metric_standart/extended_model_metrics.csv')
-- `--plots-dir`: Directory to save plots (default: 'metric_standart/plots')
-- `--time-step`: Time step for sequence data (default: 5)
-- `--plot-samples`: Number of samples to plot for predictions (default: 100)
+Параметры:
+- `--data`: Путь к файлу данных (по умолчанию: 'data/data.csv')
+- `--models-dir`: Директория, содержащая группы моделей (по умолчанию: 'model_save_preset/models')
+- `--output`: Выходной файл для метрик (по умолчанию: 'metric_standart/extended_model_metrics.csv')
+- `--plots-dir`: Директория для сохранения графиков (по умолчанию: 'metric_standart/plots')
+- `--time-step`: Временной шаг для последовательных данных (по умолчанию: 5)
+- `--plot-samples`: Количество образцов для визуализации предсказаний (по умолчанию: 100)
 
-### 2. Analyze Results
+### 2. Анализ результатов
 
-This script analyzes and visualizes the evaluation results with various charts and comparisons.
+Этот скрипт анализирует и визуализирует результаты оценки с помощью различных диаграмм и сравнений.
 
 ```bash
 python metric_standart/analyze_results.py --metrics-file metric_standart/extended_model_metrics.csv
 ```
 
-Parameters:
-- `--metrics-file`: Path to the metrics CSV file (default: 'metric_standart/extended_model_metrics.csv')
-- `--output-dir`: Directory to save analysis plots (default: 'metric_standart/plots')
-- `--summary-file`: Path to save the summary report (default: 'metric_standart/model_summary.txt')
+Параметры:
+- `--metrics-file`: Путь к файлу с метриками CSV (по умолчанию: 'metric_standart/extended_model_metrics.csv')
+- `--output-dir`: Директория для сохранения графиков анализа (по умолчанию: 'metric_standart/plots')
+- `--summary-file`: Путь для сохранения итогового отчета (по умолчанию: 'metric_standart/model_summary.txt')
 
-## Output
+## Вывод
 
-The toolkit generates the following outputs:
+Инструментарий генерирует следующие выходные данные:
 
-1. **Extended metrics CSV file** - Contains all calculated metrics for each model
-2. **Prediction comparison plots** - Visual comparison of actual vs. predicted values
-3. **Metric comparison plots** - Bar charts comparing models on each metric
-4. **Radar charts** - Comparing top models across multiple metrics
-5. **Group performance plots** - Box plots showing metric distribution by model group
-6. **Summary report** - Text file with best models by metric and group statistics
+1. **Файл расширенных метрик CSV** - Содержит все рассчитанные метрики для каждой модели
+2. **Графики сравнения предсказаний** - Визуальное сравнение фактических и предсказанных значений
+3. **Графики сравнения метрик** - Столбчатые диаграммы, сравнивающие модели по каждой метрике
+4. **Лепестковые диаграммы** - Сравнение лучших моделей по нескольким метрикам
+5. **Графики производительности групп** - Диаграммы размаха, показывающие распределение метрик по группам моделей
+6. **Итоговый отчет** - Текстовый файл с лучшими моделями по метрикам и статистикой по группам
 
-## Advanced Usage
+## Расширенное использование
 
-### Using the Core Module
+### Использование основного модуля
 
-You can import functions from the model_evaluator module in your own Python scripts:
+Вы можете импортировать функции из модуля model_evaluator в свои собственные Python-скрипты:
 
 ```python
 from metric_standart.model_evaluator import (
@@ -86,15 +86,15 @@ from metric_standart.model_evaluator import (
     save_evaluation_results
 )
 
-# Load and prepare data
+# Загрузка и подготовка данных
 data = load_and_prepare_data('data/data.csv')
 
-# Load models
+# Загрузка моделей
 models = load_models_from_directory('model_save_preset/models')
 
-# Evaluate models
+# Оценка моделей
 results = evaluate_models(models, data)
 
-# Save results
+# Сохранение результатов
 save_evaluation_results(results, 'my_metrics.csv')
 ``` 
