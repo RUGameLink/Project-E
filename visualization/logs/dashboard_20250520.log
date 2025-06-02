@@ -1,0 +1,27 @@
+2025-05-20 18:39:34,056 - dashboard - INFO - Дашборд запущен
+2025-05-20 18:39:34,161 - dashboard - INFO - Дашборд запущен
+2025-05-20 18:39:34,161 - dashboard - INFO - Дашборд запущен
+2025-05-20 18:39:34,175 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 18:39:34,175 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 18:39:34,178 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 18:39:34,178 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 18:39:34,178 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 18:39:34,178 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 18:39:35,822 - dashboard - INFO - Загрузка историй моделей из директории: ..\for_docker\model_save_preset
+2025-05-20 18:39:35,822 - dashboard - INFO - Загрузка историй моделей из директории: ..\for_docker\model_save_preset
+2025-05-20 18:39:35,847 - dashboard - INFO - Загружено 18 моделей из 4 групп
+2025-05-20 18:39:35,847 - dashboard - INFO - Загружено 18 моделей из 4 групп
+2025-05-20 18:39:35,850 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 18:39:35,850 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 18:39:35,858 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 18:39:35,858 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 18:39:35,860 - dashboard - INFO - Создана таблица сравнения с 18 моделями
+2025-05-20 18:39:35,860 - dashboard - INFO - Создана таблица сравнения с 18 моделями

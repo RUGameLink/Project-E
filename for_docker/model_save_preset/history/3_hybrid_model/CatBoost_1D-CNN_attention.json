@@ -1,0 +1,11 @@
+{
+	"history": {
+		"mse": 90564019,
+		"mae": 7406,
+		"rmse": 9516
+	},
+	"params": {},
+	"epoch": [],
+	"model_name": "CatBoost, 1D-CNN и Attention",
+	"group_name": "5. Гибридные и ансамблевые архитектуры"
+}

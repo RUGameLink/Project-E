@@ -12,3 +12,6 @@ data/test3.csv
 /metric_standart/zip
 /for_docker/visualization/venv
 /data
+/for_docker/models_api/.venv
+/for_docker/models_api2/.venv
+/for_docker/models_api2/.venv

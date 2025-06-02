@@ -306,7 +306,7 @@ def main():
         # Navigation
         pages = [
             "Обзор моделей",
-            "История обучения",
+        #    "История обучения",
             "Сравнение моделей",
             "Лучшие модели"
         ]
@@ -487,6 +487,10 @@ def display_model_overview(all_histories, comparison_df):
             columns_to_drop.append('norm_mae')
         if 'median_absolute_error' in comparison_df.columns:
             columns_to_drop.append('median_absolute_error')
+        if 'explained_variance' in comparison_df.columns:
+            columns_to_drop.append('explained_variance')
+        if 'max_error' in comparison_df.columns:
+            columns_to_drop.append('max_error')
             
         if columns_to_drop:
             comparison_df = comparison_df.drop(columns=columns_to_drop)
@@ -824,7 +828,7 @@ def display_model_comparison(all_histories, comparison_df):
         # Select metric for comparison
         selected_metric = st.selectbox(
             "Выберите метрику для сравнения:",
-            options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+            options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error', 'max_error', 'explained_variance']],
             format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
         )
         
@@ -852,8 +856,8 @@ def display_model_comparison(all_histories, comparison_df):
         # Select metrics for radar chart
         selected_metrics = st.multiselect(
             "Выберите метрики для лепестковой диаграммы:",
-            options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
-            default=[m for m in STANDARD_METRICS[:5] if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+            options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error', 'max_error', 'explained_variance']],
+            default=[m for m in STANDARD_METRICS[:5] if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error', 'max_error', 'explained_variance']],
             format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
         )
         
@@ -965,7 +969,7 @@ def display_model_comparison(all_histories, comparison_df):
                 # Select metric for group comparison
                 selected_metric = st.selectbox(
                     "Выберите метрику для сравнения групп:",
-                    options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+                    options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error', 'max_error', 'explained_variance']],
                     format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x),
                     key="group_comparison_metric"
                 )
@@ -1034,7 +1038,7 @@ def display_best_models(all_histories):
     # Select metric for determining best models
     selected_metric = st.selectbox(
         "Выберите метрику для ранжирования:",
-        options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error']],
+        options=[m for m in STANDARD_METRICS if m not in ['mape', 'r2', 'r2_score', 'norm_rmse', 'norm_mae', 'median_absolute_error', 'max_error', 'explained_variance']],
         format_func=lambda x: METRIC_DISPLAY_NAMES.get(x, x)
     )
     

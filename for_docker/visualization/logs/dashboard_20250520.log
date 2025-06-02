@@ -1,0 +1,1548 @@
+2025-05-20 20:39:12,885 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:12,928 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:12,928 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:12,936 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:12,936 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:12,938 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:12,938 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:12,939 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:12,939 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:14,172 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:14,172 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:14,182 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:14,182 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:14,184 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:39:14,184 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:39:14,190 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:14,190 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:14,192 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:14,192 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:51,159 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:51,159 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:51,159 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:51,162 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:51,162 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:51,162 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:51,163 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:51,163 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:51,163 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:51,163 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:51,163 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:51,163 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:51,168 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:51,168 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:51,168 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:51,183 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:51,183 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:51,183 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:51,185 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:51,185 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:51,185 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:51,196 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:51,196 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:51,196 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:51,200 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:51,200 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:51,200 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:55,303 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:55,303 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:55,303 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:55,303 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:55,321 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:55,321 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:55,321 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:55,321 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:55,322 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:55,322 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:55,322 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:55,322 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:55,323 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:55,323 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:55,323 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:55,323 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:55,325 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:55,325 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:55,325 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:55,325 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:55,339 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:55,339 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:55,339 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:55,339 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:55,341 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:55,341 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:55,341 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:55,341 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:55,354 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:55,354 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:55,354 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:55,354 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:55,356 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:55,356 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:55,356 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:55,356 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:57,526 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:57,526 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:57,526 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:57,526 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:57,526 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:57,530 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:57,530 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:57,530 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:57,530 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:57,530 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:57,531 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:57,531 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:57,531 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:57,531 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:57,531 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:57,532 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:57,532 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:57,532 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:57,532 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:57,532 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:57,543 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:57,543 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:57,543 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:57,543 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:57,543 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:57,554 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:57,554 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:57,554 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:57,554 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:57,554 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:57,557 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:57,557 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:57,557 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:57,557 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:57,557 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:57,567 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:57,567 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:57,567 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:57,567 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:57,567 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:57,569 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:57,569 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:57,569 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:57,569 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:57,569 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:58,356 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:58,356 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:58,356 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:58,356 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:58,356 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:58,356 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:39:58,362 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:58,362 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:58,362 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:58,362 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:58,362 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:58,362 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:39:58,363 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:58,363 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:58,363 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:58,363 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:58,363 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:58,363 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:39:58,363 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:58,363 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:58,363 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:58,363 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:58,363 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:58,363 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:39:58,365 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:58,365 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:58,365 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:58,365 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:58,365 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:58,365 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:39:58,380 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:58,380 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:58,380 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:58,380 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:58,380 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:58,380 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:39:58,383 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:58,383 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:58,383 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:58,383 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:58,383 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:58,383 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:39:58,393 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:58,393 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:58,393 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:58,393 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:58,393 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:58,393 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:39:58,397 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:58,397 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:58,397 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:58,397 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:58,397 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:39:58,397 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:01,099 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:01,099 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:01,099 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:01,099 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:01,099 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:01,099 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:01,099 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:01,105 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:01,105 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:01,105 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:01,105 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:01,105 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:01,105 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:01,105 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:01,107 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:01,107 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:01,107 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:01,107 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:01,107 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:01,107 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:01,107 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:01,108 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:01,108 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:01,108 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:01,108 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:01,108 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:01,108 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:01,108 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:01,113 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:01,113 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:01,113 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:01,113 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:01,113 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:01,113 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:01,113 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:01,133 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:01,133 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:01,133 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:01,133 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:01,133 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:01,133 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:01,133 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:01,136 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:01,136 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:01,136 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:01,136 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:01,136 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:01,136 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:01,136 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:01,151 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:01,151 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:01,151 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:01,151 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:01,151 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:01,151 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:01,151 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:01,153 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:01,153 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:01,153 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:01,153 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:01,153 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:01,153 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:01,153 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,326 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,332 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,333 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,334 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,337 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,351 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,354 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,365 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:23,368 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,411 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,416 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,418 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,419 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,422 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,436 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,439 - dashboard - INFO - Переход на страницу: Обзор моделей
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,450 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:39,453 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,567 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,573 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,574 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,575 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,581 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,594 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,599 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,609 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:40,611 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,186 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,190 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,192 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,193 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,195 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,210 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,220 - dashboard - INFO - Переход на страницу: История обучения
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,225 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:40:58,232 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,217 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,221 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,223 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,224 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,228 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,238 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,244 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,249 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:43,251 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,368 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,374 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,375 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,376 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,381 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,393 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,399 - dashboard - INFO - Переход на страницу: Сравнение моделей
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,408 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:46,414 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,377 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,381 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,382 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,385 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,388 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,404 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,408 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,417 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:51,422 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,189 - dashboard - INFO - Дашборд запущен
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,194 - dashboard - ERROR - Ошибка при сборе системной информации: No module named 'tensorflow'
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,195 - dashboard - ERROR - Traceback (most recent call last):
+  File "D:\.Ucheba\ВКР\Project E\Project-E\for_docker\visualization\dashboard.py", line 172, in log_system_info
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,198 - dashboard - INFO - Запуск основной функции дашборда
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,204 - dashboard - INFO - Загрузка историй моделей из директории: ..\model_save_preset
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,218 - dashboard - INFO - Загружено 11 моделей из 3 групп
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,221 - dashboard - INFO - Переход на страницу: Лучшие модели
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,232 - dashboard - INFO - Создание таблицы сравнения метрик
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями
+2025-05-20 20:41:57,238 - dashboard - INFO - Создана таблица сравнения с 10 моделями

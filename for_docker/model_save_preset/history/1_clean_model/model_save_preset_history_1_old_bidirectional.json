@@ -1,0 +1,11 @@
+{
+  "history": {
+    "mse": 0.052948,
+    "mae": 0.192638,
+    "rmse": 0.230104
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "Bidirectional RNN",
+  "group_name": "1. Классические рекуррентные модели"
+}

@@ -1,0 +1,11 @@
+{
+  "history": {
+    "mse": 36226657,
+    "mae": 4758,
+    "rmse": 6018
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "Bidirectional LSTM",
+  "group_name": "3. Рекуррентные модели с оркестраторами"
+}

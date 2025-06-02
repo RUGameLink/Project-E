@@ -1,0 +1,11 @@
+{
+  "history": {
+    "mse": 29994481,
+    "mae": 4306,
+    "rmse": 5476
+  },
+  "params": {},
+  "epoch": [],
+  "model_name": "CNN-LSTM",
+  "group_name": "4. Расширенная ансамблевая RNN"
+}

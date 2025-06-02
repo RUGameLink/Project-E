@@ -1,0 +1,11 @@
+{
+	"history": {
+		"mse": 92301174,
+		"mae": 7443,
+		"rmse": 9607
+	},
+	"params": {},
+	"epoch": [],
+	"model_name": "XGBoost, LSTM и Attention",
+	"group_name": "5. Гибридные и ансамблевые архитектуры"
+}
