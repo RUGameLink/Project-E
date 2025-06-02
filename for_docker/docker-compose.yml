@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./models_api2
+    container_name: models_api2
+    volumes:
+      - ./model_save_preset:/app/model_save_preset:ro   # общий read-only том
+    environment:
+      - MODEL_DIR=/app/model_save_preset
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8000/health || exit 1"]
+      interval: 30s
+      retries: 3
+    ports:
+      - "8000:8000"
+
+  viz:
+    build: ./visualization
+    container_name: visualization
+    depends_on:
+      - api
+    volumes:
+      - ./model_save_preset:/app/model_save_preset:ro
+    environment:
+      - API_URL=http://api:8000              # обращение по docker-compose DNS
+    ports:
+      - "8501:8501"
+    command: >
+      streamlit run dashboard.py
+      --server.port 8501
+      --server.address 0.0.0.0
+      --server.enableCORS false
