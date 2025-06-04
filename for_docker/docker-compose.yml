@@ -5,7 +5,7 @@ services:
     build: ./models_api2
     container_name: models_api2
     volumes:
-      - ./model_save_preset:/app/model_save_preset:ro   # общий read-only том
+      - ./model_save_preset:/app/model_save_preset:ro
     environment:
       - MODEL_DIR=/app/model_save_preset
     healthcheck:
@@ -23,7 +23,7 @@ services:
     volumes:
       - ./model_save_preset:/app/model_save_preset:ro
     environment:
-      - API_URL=http://api:8000              # обращение по docker-compose DNS
+      - API_URL=http://api:8000
     ports:
       - "8501:8501"
     command: >

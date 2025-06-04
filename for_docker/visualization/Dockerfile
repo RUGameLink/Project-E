@@ -1,12 +1,13 @@
 # for_docker/visualization/Dockerfile
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    TZ=UTC
+    PIP_NO_CACHE_DIR=1 \
+	PIP_DEFAULT_TIMEOUT=300
 
 WORKDIR /app
-COPY requirements.txt .           # если есть
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
     && pip install streamlit requests
 
